@@ -10,8 +10,8 @@
     {
       "name": "nyoa",
       "source": "./plugins/nyoa",
-      "description": "Real estate agent toolkit — 8 AI skills: listing audit, listing copy, buyer/seller comms, AEO content, listing presentations, offer analysis, social content, and testimonial management.",
-      "version": "0.4.2",
+      "description": "Real estate agent operating system — 15 AI skills: guided onboarding, client/listing/pipeline workspace, weekly review, interaction log, connector detection, plus listing audit, listing copy, buyer/seller comms, AEO content, listing presentations, offer analysis, social content, and testimonial management.",
+      "version": "0.5.0",
       "author": {
         "name": "Automatic",
         "email": "david@automatic.so",
@@ -21,7 +21,7 @@
       "repository": "https://github.com/flynndavid/nyoa-plugin",
       "license": "MIT",
       "category": "real-estate",
-      "tags": ["real-estate", "nyoa", "listings", "agent", "comms", "mls", "aeo", "offers", "social-media", "testimonials"]
+      "tags": ["real-estate", "nyoa", "listings", "agent", "comms", "mls", "aeo", "offers", "social-media", "testimonials", "workspace", "onboarding", "pipeline", "crm"]
     }
   ]
 }
