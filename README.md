@@ -1,12 +1,30 @@
 # NYOA — Not Your Ordinary Agent
 
-A preconfigured Claude for real estate agents. Install once, get three skills:
+A preconfigured Claude for real estate agents. Install once, get **eight skills** that handle the work agents do every day:
 
+### Listing workflow
+- **`/nyoa-listing-presentation`** — Win the listing appointment. Generate a complete seller pitch: market narrative from your comps, comp summary table, pricing strategy with rationale, marketing plan, and "Why Me" section.
 - **`/nyoa-listing-audit`** — Score any listing and (optionally) generate a polished HTML demo page with the photos saved locally. Works with a Zillow / Redfin / Realtor.com / MLS URL or pasted MLS remarks.
 - **`/nyoa-listing-copy`** — Turn a property fact sheet into a full launch package: MLS remarks, long description, X / Instagram posts, and a buyer email blast. Tunable to your voice.
-- **`/nyoa-buyer-seller-comms`** — Draft the recurring messages you send every week: buyer drips, seller updates, offer summaries, follow-ups, referral asks. SMS / email / voicemail variants.
 
-All three enforce Fair Housing compliance automatically (no protected-class language, no unsourced structural claims, "primary bedroom" not "master") and strip the usual real-estate clichés ("stunning", "must see", "nestled", "boasts").
+### Client communications
+- **`/nyoa-buyer-seller-comms`** — Draft the recurring messages you send every week: buyer drips, seller updates, offer summaries, follow-ups, referral asks. SMS / email / voicemail variants.
+- **`/nyoa-offer-analyzer`** — Paste a contract → get a plain-English seller briefing. Auto-extracts price, financing, earnest, contingencies, etc. Compares multiple offers side-by-side. Drafts counter-offer talking points.
+
+### Brand & lead gen
+- **`/nyoa-aeo`** — Get recommended by ChatGPT, Perplexity, and Gemini. Generate AI-optimized articles using the four-type framework: Best Choice, Reasons to Choose, Local Service, Head-to-Head.
+- **`/nyoa-social-content`** — A week of social content that isn't tied to a specific listing. Market commentary, neighborhood spotlights, buyer/seller tips, behind-the-scenes, engagement posts, testimonial features. Per-platform formatting (Instagram / X / Facebook / LinkedIn).
+- **`/nyoa-testimonial-engine`** — Collect, catalog, and repurpose testimonials. Turn a Google review into an AEO proof element, a social post, a listing-presentation pull-quote. Generate review-request emails and SMS for post-close outreach.
+
+All eight skills enforce **Fair Housing compliance** automatically (no protected-class language, no unsourced structural claims, "primary bedroom" not "master") and strip the usual real-estate clichés ("stunning", "must see", "nestled", "boasts").
+
+---
+
+## What's new in v0.4.0
+
+This release adds 5 new skills and a shared agent-identity layer that all skills read from and write to. The five new skills (`/nyoa-aeo`, `/nyoa-listing-presentation`, `/nyoa-offer-analyzer`, `/nyoa-social-content`, `/nyoa-testimonial-engine`) cover the workflow gaps the original three didn't: winning listings, getting found by AI search, analyzing offers, ongoing social content, and systematically building a proof bank.
+
+The shared `nyoa-context/` directory grows over time as you use the skills — testimonials added once become available everywhere; voice preferences are remembered across sessions. See [Shared agent context](#shared-agent-context) below.
 
 ---
 
@@ -27,7 +45,7 @@ You should see the **NYOA** marketplace appear in your list.
 
 In the marketplace's plugin list, find **nyoa** and click **Install**. Toggle it on if it isn't already.
 
-That's it. The three slash commands (`/nyoa-listing-audit`, `/nyoa-listing-copy`, `/nyoa-buyer-seller-comms`) are now available in any Claude conversation.
+That's it. All eight slash commands are now available in any Claude conversation.
 
 ### 3. Turn on auto-update (recommended)
 
@@ -41,11 +59,27 @@ When this is on, Cowork checks the GitHub repo at the start of each session and 
 
 If you'd rather update manually, leave auto-update off and click **Update** on the marketplace card whenever you want the latest version.
 
+### Already installed? Force a re-sync to get v0.4.0
+
+If you installed an earlier version and don't see the new skills:
+
+1. Open the **Marketplaces** view.
+2. Click **Update** on the NYOA marketplace card (not just refresh — a page refresh doesn't re-pull from GitHub).
+3. Then click **Update** on the `nyoa` plugin itself.
+4. After the update completes, the five new slash commands should appear in your conversation autocomplete.
+
+If they still don't appear, remove and re-add the marketplace using the same URL — that forces a full re-sync.
+
 ---
 
-## Try it (5-minute test)
+## Try it (10-minute test)
 
-Open a new Claude conversation and try each one:
+Open a new Claude conversation and try a few:
+
+**Listing presentation:**
+> I have a listing appointment tomorrow at 312 Maple St in East Nashville. Target list price is $625K. Comps: 405 Maple sold $612K (similar layout, smaller lot), 218 Cedar sold $649K (updated kitchen, 100 sqft larger), 89 Walnut sold $598K (no updates, comparable size). Help me prepare a presentation.
+
+You should get a market narrative, comp table, pricing strategy, marketing plan, and value-prop section — all in one response.
 
 **Listing audit:**
 > Audit this listing: https://www.zillow.com/homedetails/[any-real-listing]
@@ -62,6 +96,26 @@ You should get MLS remarks, a long description, three social variants, and a new
 
 You should get an SMS variant and an email variant ready to copy/paste.
 
+**Offer analyzer:**
+> Analyze this offer: [paste a real offer or summary of terms]. Listing was at $625K.
+
+You should get a plain-English summary, key terms extracted, strengths and weaknesses, and a recommendation — pre-formatted for emailing the seller.
+
+**AEO content:**
+> Write a Best Choice article: "Who's the best realtor in East Nashville for first-time buyers?"
+
+The skill will gather context if it doesn't have it (business name, services, locations), then draft an 800-1,200 word article in third person, AI-optimized for ChatGPT and Perplexity to recommend you.
+
+**Social content:**
+> Give me 5 social posts for this week. I'm a Nashville realtor specializing in East Nashville and Germantown. Focus on Instagram and X.
+
+You should get a 5-day content calendar with platform-specific copy.
+
+**Testimonial engine:**
+> Add this testimonial — "Working with Ann-Riley was the smoothest closing I've ever had. She caught two issues with the inspection report I would've missed." — from Sarah M., a buyer client. Then turn it into an Instagram post.
+
+The skill saves to your proof bank and generates a narrative social post.
+
 ---
 
 ## Use it well
@@ -75,6 +129,23 @@ The skills look for a per-agent voice file before falling back to the NYOA house
 3. Tell Claude where it is the first time you use a skill: "Use my voice file at `~/Documents/voice.md`."
 
 After that, every output adapts to your voice automatically.
+
+### Shared agent context
+
+Five of the eight skills (everything except listing-audit, listing-copy, and buyer-seller-comms) share a `nyoa-context/` directory that stores your business identity:
+
+```
+nyoa-context/
+├── profile.md      # Business name, services, locations, differentiators
+├── voice.md        # Tone and style preferences
+├── proofs.md       # Testimonials, awards, stats
+├── competitors.md  # Competitor research
+└── feedback.md     # Accumulated corrections from you
+```
+
+The directory starts empty and builds organically as you work with the skills. Add a testimonial via `/nyoa-testimonial-engine` and it becomes available in `/nyoa-aeo` articles, `/nyoa-listing-presentation` value-prop sections, and `/nyoa-social-content` spotlight posts. Each skill gets smarter with use.
+
+You can also edit these files manually if you want to seed your context up front.
 
 ### What the listing audit can do with photos
 
@@ -97,9 +168,11 @@ If auto-update is off, click **Update** on the NYOA marketplace card whenever yo
 
 ## Troubleshooting
 
+**"Only 3 skills showing after update"** — A page refresh doesn't re-pull from GitHub. Click **Update** on the marketplace card (not the plugin), wait for it to complete, then update the plugin itself. If still showing 3, remove and re-add the marketplace.
+
 **"Marketplace sync failed"** — Most often a `marketplace.json` schema validation error after a recent update. Wait a beat and try sync again, or DM David.
 
-**Slash commands not appearing after install** — In Cowork, refresh the page. In Claude Code CLI, run `/reload-plugins`.
+**Slash commands not appearing after install** — In Cowork, refresh the page after the marketplace + plugin updates have both completed. In Claude Code CLI, run `/reload-plugins`.
 
 **Listing audit can't read a Zillow page** — Zillow blocks most scrapers. Either install the Firecrawl MCP (handles JS rendering) or paste the MLS remarks + photo URLs into chat directly.
 
@@ -114,13 +187,20 @@ nyoa-plugin/
 ├── .claude-plugin/marketplace.json
 └── plugins/nyoa/
     ├── .claude-plugin/plugin.json
+    ├── references/
+    │   └── context-formats.md         # Shared nyoa-context/ format docs
     └── skills/
         ├── nyoa-listing-audit/
         ├── nyoa-listing-copy/
-        └── nyoa-buyer-seller-comms/
+        ├── nyoa-buyer-seller-comms/
+        ├── nyoa-listing-presentation/  ← new in v0.4.0
+        ├── nyoa-offer-analyzer/        ← new in v0.4.0
+        ├── nyoa-aeo/                   ← new in v0.4.0
+        ├── nyoa-social-content/        ← new in v0.4.0
+        └── nyoa-testimonial-engine/    ← new in v0.4.0
 ```
 
-Each skill has a `SKILL.md` (the instructions Claude follows), an `assets/templates/` folder (output structures), and a `references/` folder (rubrics, voice presets, channel rules).
+Each skill has a `SKILL.md` (the instructions Claude follows), an `assets/templates/` folder (output structures), and a `references/` folder (rubrics, voice presets, channel rules, article specs, content type examples).
 
 ---
 
