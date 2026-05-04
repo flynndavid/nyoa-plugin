@@ -30,6 +30,8 @@ Optional but improves output:
 - Agent's specialties or niches (luxury, first-time buyers, investors, etc.)
 - `nyoa-context/profile.md` (services, differentiators)
 - `nyoa-context/proofs.md` (testimonials for spotlight posts)
+- `nyoa-workspace/reviews/` (last week's review — surface a win or learning)
+- `nyoa-workspace/listings/*/property.md` (active listings — feed neighborhood spotlight posts)
 
 ## Voice modes
 
@@ -55,10 +57,12 @@ For a week of content (5 posts default), select from these categories. No more t
 ## Workflow
 
 1. Read voice file and/or `nyoa-context/profile.md` if available. Understand the agent's niche, market, and tone.
-2. Select the content mix — 5 posts from different categories. No more than 2 of the same type.
-3. Draft each post with per-platform formatting (see Platform specs below).
-4. Run the compliance pass on every post.
-5. Deliver as a content calendar: Day 1–5, each with platform, post type, and the actual copy.
+2. (Optional) Read `nyoa-workspace/reviews/` for recent wins/learnings to source Behind-the-Scenes posts; read `nyoa-workspace/listings/*/property.md` for an active listing to source a Neighborhood Spotlight.
+3. Select the content mix — 5 posts from different categories. No more than 2 of the same type.
+4. Draft each post with per-platform formatting (see Platform specs below).
+5. Run the compliance pass on every post.
+6. Write through to the workspace (see Workspace integration below).
+7. Deliver as a content calendar: Day 1–5, each with platform, post type, and the actual copy.
 
 ## Platform specs
 
@@ -94,6 +98,12 @@ Scan every post for:
 - **Testimonial permission** — testimonial spotlight posts require the agent to confirm they have permission to share. Flag this: "Confirm you have [client name]'s permission to share this publicly."
 - **Cliché ban** — same list as nyoa-listing-copy. No "stunning", "nestled", "dream home", "don't miss". Replace with specifics.
 
+## Workspace integration
+
+If `nyoa-workspace/` exists, save the calendar to `nyoa-workspace/social/<YYYY-MM-DD>-week.md` (creating the `social/` folder if absent). Don't overwrite — date-stamp each week's calendar. If a specific post references an active listing, also append a one-liner to that listing's `copy.md` revision history.
+
+If no workspace, skip silently. The inline calendar response is the deliverable.
+
 ## Output format
 
 Single Markdown response structured as a content calendar:
@@ -116,7 +126,7 @@ Single Markdown response structured as a content calendar:
 [Continue for 5 posts]
 ```
 
-End with: "Voice used: <agent name | NYOA house>."
+End with: "Voice used: <agent name | NYOA house>." If workspace write-through ran, also confirm: "Saved to nyoa-workspace/social/<YYYY-MM-DD>-week.md."
 
 ## Shared context
 
@@ -124,6 +134,10 @@ This skill reads from `nyoa-context/`:
 - `profile.md` — agent specialties, market area, differentiators
 - `voice.md` — tone and style preferences
 - `proofs.md` — testimonials for spotlight posts
+
+And from `nyoa-workspace/` (when present):
+- `reviews/` — recent wins/learnings for behind-the-scenes posts
+- `listings/*/property.md` — active listings for neighborhood spotlights
 
 ## Reference files
 
