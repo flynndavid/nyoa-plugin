@@ -1,6 +1,6 @@
 {
-  "name": "NYOA",
-  "version": "0.3.0",
+  "name": "nyoa",
+  "version": "0.3.1",
   "description": "NYOA — listing audit (with photo download + HTML demo page), listing copy in agent voice, and buyer/seller communications templates for real estate agents.",
   "author": {
     "name": "Automatic",

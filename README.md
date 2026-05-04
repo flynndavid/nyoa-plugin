@@ -12,7 +12,7 @@ A Claude Code / Cowork plugin marketplace that ships a preconfigured Claude for 
 
 ```bash
 /plugin marketplace add flynndavid/nyoa-plugin
-/plugin install NYOA@NYOA
+/plugin install nyoa@nyoa
 ```
 
 ## Install (Cowork)
