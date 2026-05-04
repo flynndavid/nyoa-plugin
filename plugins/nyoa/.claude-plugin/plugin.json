@@ -1,11 +1,11 @@
 {
   "name": "nyoa",
-  "version": "0.3.1",
-  "description": "NYOA — listing audit (with photo download + HTML demo page), listing copy in agent voice, and buyer/seller communications templates for real estate agents.",
+  "version": "0.4.0",
+  "description": "NYOA — 8 AI skills for real estate agents: listing audit (with photo download + HTML demo page), listing copy, buyer/seller comms, AEO content (Best Choice / Reasons to Choose / Local Service / Head-to-Head), listing presentations, offer analysis, social content, and testimonial management.",
   "author": {
     "name": "Automatic",
     "email": "david@automatic.so",
     "url": "https://davidflynn.co"
   },
-  "keywords": ["real-estate", "nyoa", "listings", "mls", "agent", "comms"]
+  "keywords": ["real-estate", "nyoa", "listings", "mls", "agent", "comms", "aeo", "offers", "social-media", "testimonials"]
 }

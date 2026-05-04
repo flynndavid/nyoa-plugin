@@ -5,3 +5,14 @@
 node_modules/
 .env
 .env.local
+
+# Google Drive metadata
+Icon
+Icon?
+Icon*
+
+# macOS metadata
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
