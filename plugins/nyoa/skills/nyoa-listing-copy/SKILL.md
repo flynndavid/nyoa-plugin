@@ -13,7 +13,7 @@ Turn a property fact sheet into a complete listing-launch package. Five delivera
 - "Social posts for this listing"
 - "Send out a new-listing email for [address]"
 - "Launch this listing"
-- User pastes a property fact sheet (address + beds/baths/sqft + features) and asks for marketing copy
+- User pastes a property fact sheet (address + beds / baths / sqft + features) and asks for marketing copy
 - User just renamed or updated a property and asks for a new copy package
 
 ## Inputs you need
@@ -22,7 +22,7 @@ Required:
 - **Address** (verifiable — never invent)
 - **Price**
 - **Beds / baths / square footage**
-- **3–8 specific features** (finishes, layout, lot, location anchors)
+- **3-8 specific features** (finishes, layout, lot, location anchors)
 
 Optional but improves output:
 - Year built
@@ -53,7 +53,8 @@ Determine voice in this order:
 5. Draft the **three social variants** (`assets/templates/social-x.md`, `social-instagram.md`, `social-facebook.md` if requested — see note below).
 6. Draft the **email blast** (`assets/templates/email-blast.md`).
 7. Run the compliance pass on every output (see Compliance below).
-8. Deliver everything in one Markdown response, in this order: MLS · long · social-x · social-instagram · email blast.
+8. Write through to the workspace (see Workspace integration below).
+9. Deliver everything in one Markdown response, in this order: MLS · long · social-x · social-instagram · email blast.
 
 > **Social platforms:** Default set is X, Instagram, and a buyer email. If the user asks for Facebook, LinkedIn, or TikTok script, generate those too using the same voice — the templates are shaped enough to extend.
 
@@ -61,13 +62,23 @@ Determine voice in this order:
 
 Scan every output for:
 
-- **Fair Housing red flags** — "great for families", "perfect for kids", "family neighborhood", "walk to church/synagogue/mosque", "Christian/Jewish/Muslim community", "bachelor pad", "perfect for newlyweds", "exclusive community" (when targeting protected class), "great schools" (without source).
+- **Fair Housing red flags** — "great for families", "perfect for kids", "family neighborhood", "walk to church / synagogue / mosque", "Christian / Jewish / Muslim community", "bachelor pad", "perfect for newlyweds", "exclusive community" (when targeting protected class), "great schools" (without source).
 - **"Master bedroom"** — replace with "primary bedroom".
-- **Unsourced structural claims** — never write "fully renovated", "new roof/HVAC/electrical", "completely updated" unless the agent confirmed it. If unconfirmed, soften ("recently refreshed kitchen") or pull entirely.
+- **Unsourced structural claims** — never write "fully renovated", "new roof / HVAC / electrical", "completely updated" unless the agent confirmed it. If unconfirmed, soften ("recently refreshed kitchen") or pull entirely.
 - **Cliché ban** — strip "stunning", "must see", "nestled", "boasts", "rare opportunity", "luxury living awaits", "don't miss". Replace with concrete specifics.
 
 If the agent's input itself contains a Fair Housing red flag, surface it explicitly: "I flagged 'great for families' in your input — Fair Housing risk. Rewriting around the lifestyle without the demographic claim."
 
+## Workspace integration
+
+If `nyoa-workspace/listings/<slug>/` exists for the address (or one matches an existing listing folder), also write the canonical copy there:
+
+- Save MLS remarks, long description, hero line, social one-liner, and email blurb into `nyoa-workspace/listings/<slug>/copy.md` under the matching headers.
+- Append a line to that file's `## Revision history` with today's date and a one-line summary of what changed.
+- Refresh `pipeline.md` last-activity date for the listing.
+
+If the listing folder doesn't exist, ask: "Want me to create `listings/<slug>/` so future copy + comps + showings live alongside this?" If yes, defer to `/nyoa-listing-add`. If no (or if `nyoa-workspace/` doesn't exist at all), skip the write-through silently — the inline Markdown response is still complete.
+
 ## Output format
 
-Single Markdown response. Each section under a clear `##` heading. Each output is independently copy-pasteable into the right channel. End with a one-line "Voice used: <agent name | preset name | NYOA house>" so the agent knows what produced this.
+Single Markdown response. Each section under a clear `##` heading. Each output is independently copy-pasteable into the right channel. End with a one-line "Voice used: <agent name | preset name | NYOA house>" so the agent knows what produced this. If the workspace write-through ran, also confirm: "Saved to nyoa-workspace/listings/<slug>/copy.md."

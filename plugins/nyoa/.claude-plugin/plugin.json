@@ -1,11 +1,11 @@
 {
   "name": "nyoa",
-  "version": "0.4.2",
-  "description": "NYOA — 8 AI skills for real estate agents: listing audit (with photo download + HTML demo page), listing copy, buyer/seller comms, AEO content (Best Choice / Reasons to Choose / Local Service / Head-to-Head), listing presentations, offer analysis, social content, and testimonial management.",
+  "version": "0.5.0",
+  "description": "NYOA — a real estate operating system for Claude. 15 AI skills covering onboarding, daily workflow (clients, listings, pipeline, weekly review, interaction log, connectors), and content (listing audit + photo download + HTML demo, listing copy, buyer/seller comms, AEO content, listing presentations, offer analysis, social content, testimonial management).",
   "author": {
     "name": "Automatic",
     "email": "david@automatic.so",
     "url": "https://davidflynn.co"
   },
-  "keywords": ["real-estate", "nyoa", "listings", "mls", "agent", "comms", "aeo", "offers", "social-media", "testimonials"]
+  "keywords": ["real-estate", "nyoa", "listings", "mls", "agent", "comms", "aeo", "offers", "social-media", "testimonials", "workspace", "onboarding", "pipeline", "crm"]
 }

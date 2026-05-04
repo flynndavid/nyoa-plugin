@@ -37,9 +37,12 @@ Follow-up:
 - `assets/templates/post-showing-thankyou.md` — same-day thank-you after a showing
 - `assets/templates/referral-ask.md` — post-close referral request
 
+Agent-saved overrides:
+- `nyoa-workspace/templates/intro-emails.md` and `templates/follow-up-cadence.md` — if the agent has saved their own opener email or cadence, prefer those over the built-in templates. Always check the workspace first.
+
 ## Inputs you need
 
-For every template, ask for what you don't have. The minimum required inputs are listed in each template's header. Don't invent. If the agent says "I don't have that", say what you can reasonably draft without it.
+For every template, ask for what you don't have. The minimum required inputs are listed in each template's header. **Read first, ask second** — check `nyoa-workspace/clients/<slug>/profile.md` and `preferences.md` for any client mentioned by name; check `listings/<slug>/property.md` for any address. Don't invent. If the agent says "I don't have that", say what you can reasonably draft without it.
 
 ## Channel selection
 
@@ -53,10 +56,20 @@ When in doubt, ask the agent which channel, default to email if they don't speci
 
 See `references/channel-conventions.md` for full per-channel rules.
 
+## Connector-aware delivery
+
+Read `nyoa-context/connectors.md` if it exists.
+
+- If `gmail: yes`, after drafting an email, offer: "Want me to push this to Gmail as a draft to <recipient>?" Always confirm before sending. Never auto-send.
+- If `twilio: yes` (or another SMS MCP), offer the same for SMS.
+- If `google-calendar: yes` and the message references a showing or follow-up time, offer to create a calendar event.
+- If a CRM is wired up, offer to log the message as a note on the contact.
+- If none of the above are wired up, deliver the draft inline as Markdown — same as today.
+
 ## Voice
 
 Same voice resolution order as `nyoa-listing-copy`:
-1. Per-agent voice file if present
+1. Per-agent voice file if present (`nyoa-context/voice.md` or `agents/<name>/voice.md`)
 2. Otherwise NYOA house style (warm, specific, confident, plain)
 
 Avoid template-speak: "I hope this email finds you well", "Just touching base", "Per our last conversation", "Looking forward to hearing from you".
@@ -68,6 +81,16 @@ All the same Fair Housing rules as `nyoa-listing-copy/references/voice-presets.m
 - Reference religion, ethnicity, national origin, familial status
 - Make protected-class assumptions about what a buyer wants
 
+## Workspace integration
+
+When the message targets a known client or listing in the workspace:
+
+- Append a timeline entry to `nyoa-workspace/clients/<slug>/timeline.md` (or `listings/<slug>/showings.md` for post-showing follow-ups). Format per `plugins/nyoa/references/context-formats.md`.
+- Refresh the matching `pipeline.md` last-activity stamp.
+- If the message proposes a follow-up date, also append to `nyoa-workspace/calendar.md` and `tasks.md`.
+
+If the workspace doesn't exist or the recipient isn't a tracked client, skip silently — the draft is still delivered.
+
 ## Output format
 
-Single Markdown response. If the user requested one channel, deliver one variant. If they didn't specify, deliver SMS + email by default (and a voicemail script for offer-summary, counter-offer, and referral-ask). End with a one-line note: "Channel: <SMS | email | voicemail>. Voice: <agent | NYOA house>".
+Single Markdown response. If the user requested one channel, deliver one variant. If they didn't specify, deliver SMS + email by default (and a voicemail script for offer-summary, counter-offer, and referral-ask). End with a one-line note: "Channel: <SMS | email | voicemail>. Voice: <agent | NYOA house>". If workspace write-through ran or a connector was used, add a confirmation line (e.g., "Logged to clients/jane-doe/timeline.md." or "Drafted in Gmail.").
