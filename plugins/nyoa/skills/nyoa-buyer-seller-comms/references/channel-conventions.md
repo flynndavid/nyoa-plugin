@@ -1,6 +1,6 @@
 # Channel Conventions
 
-Per-channel rules for SMS, email, and voicemail script outputs across all `buyer-seller-comms` templates.
+Per-channel rules for SMS, email, and voicemail script outputs across all `nyoa-buyer-seller-comms` templates.
 
 ---
 

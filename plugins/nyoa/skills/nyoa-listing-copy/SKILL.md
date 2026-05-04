@@ -1,5 +1,5 @@
 ---
-name: listing-copy
+name: nyoa-listing-copy
 description: Generate complete listing-launch copy for a real estate listing — MLS remarks, long description, social variants for X / Instagram / Facebook, and a buyer email blast — from the property's facts. Use this skill whenever the user wants to write or rewrite listing copy, generate social posts for a listing, draft a new-listing email, or produce a full listing-launch package. Triggers on phrases like "write listing copy", "MLS remarks for", "social posts for this listing", "new listing email", "launch this listing", or when the user gives a property fact sheet and asks for marketing copy.
 ---
 

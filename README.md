@@ -4,15 +4,15 @@ A Claude Code / Cowork plugin marketplace that ships a preconfigured Claude for 
 
 ## What's inside
 
-- **`listing-audit`** — Paste any listing URL (Zillow, Realtor, Redfin, MLS) or address. Get a strategic audit report and an optional redesigned listing page.
-- **`listing-copy`** — Turn property facts into MLS remarks, a long description, social variants (X / Instagram / Facebook), and an email blast. Tunable to the agent's voice and a property-tone preset (luxury, starter-home, investor, fixer, land).
-- **`buyer-seller-comms`** — Templates + on-demand generation for the recurring agent comms loop: buyer drips, seller updates, offer summaries, follow-ups, referral asks. SMS / email / voicemail variants.
+- **`/nyoa-listing-audit`** — Paste any listing URL (Zillow, Realtor, Redfin, MLS) or address. Get a strategic audit report, an optional Markdown rewrite, and (if photos are available) a self-contained HTML demo listing page with images saved locally.
+- **`/nyoa-listing-copy`** — Turn property facts into MLS remarks, a long description, social variants (X / Instagram / Facebook), and an email blast. Tunable to the agent's voice and a property-tone preset (luxury, starter-home, investor, fixer, land).
+- **`/nyoa-buyer-seller-comms`** — Templates + on-demand generation for the recurring agent comms loop: buyer drips, seller updates, offer summaries, follow-ups, referral asks. SMS / email / voicemail variants.
 
 ## Install (Claude Code)
 
 ```bash
 /plugin marketplace add flynndavid/nyoa-plugin
-/plugin install nyoa@nyoa
+/plugin install NYOA@NYOA
 ```
 
 ## Install (Cowork)
@@ -40,9 +40,9 @@ nyoa-plugin/
         ├── .claude-plugin/
         │   └── plugin.json
         └── skills/
-            ├── listing-audit/
-            ├── listing-copy/
-            └── buyer-seller-comms/
+            ├── nyoa-listing-audit/
+            ├── nyoa-listing-copy/
+            └── nyoa-buyer-seller-comms/
 ```
 
 Each skill is self-contained with `SKILL.md`, output templates in `assets/templates/`, and reference material in `references/`.

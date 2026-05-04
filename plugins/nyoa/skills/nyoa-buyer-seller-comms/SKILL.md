@@ -1,5 +1,5 @@
 ---
-name: buyer-seller-comms
+name: nyoa-buyer-seller-comms
 description: Draft the recurring client communications a real estate agent sends every week — buyer drips (new listings, price drops, check-ins), seller updates (weekly activity reports, showing feedback summaries), transactional comms (offer summaries in plain English, counter-offer drafts), and follow-ups (post-showing thank-yous, post-close referral asks). Use this skill whenever the user asks to draft a message to a buyer, seller, lead, or past client; summarize an offer; write a follow-up; or generate a CRM-ready template. Triggers on phrases like "draft a note to my buyers", "send a price-drop alert", "weekly seller update", "summarize this offer", "post-showing follow-up", "ask for a referral".
 ---
 
@@ -55,7 +55,7 @@ See `references/channel-conventions.md` for full per-channel rules.
 
 ## Voice
 
-Same voice resolution order as `listing-copy`:
+Same voice resolution order as `nyoa-listing-copy`:
 1. Per-agent voice file if present
 2. Otherwise NYOA house style (warm, specific, confident, plain)
 
@@ -63,7 +63,7 @@ Avoid template-speak: "I hope this email finds you well", "Just touching base", 
 
 ## Compliance
 
-All the same Fair Housing rules as `listing-copy/references/voice-presets.md`. Never:
+All the same Fair Housing rules as `nyoa-listing-copy/references/voice-presets.md`. Never:
 - Categorize the recipient by protected class ("families like yours", "couples like you")
 - Reference religion, ethnicity, national origin, familial status
 - Make protected-class assumptions about what a buyer wants

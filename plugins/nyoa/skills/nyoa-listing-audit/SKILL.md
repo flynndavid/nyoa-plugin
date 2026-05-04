@@ -1,5 +1,5 @@
 ---
-name: listing-audit
+name: nyoa-listing-audit
 description: Analyze any real estate listing and produce a strategic audit report, a redesigned listing page (Markdown), and/or a polished HTML demo page with the original photos saved locally. Use this skill whenever the user shares a property listing — by URL (Zillow, Realtor.com, Redfin, Compass, MLS), address, or pasted content — and wants to evaluate, fix, rebuild, or generate a visual mock-up of it. Triggers on phrases like "audit this listing", "what's wrong with this listing", "rewrite this listing", "redo this listing page", "generate a demo listing page", "show me what it could look like", or when the user simply pastes a listing URL.
 ---
 
