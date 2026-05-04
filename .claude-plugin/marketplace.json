@@ -11,7 +11,7 @@
       "name": "nyoa",
       "source": "./plugins/nyoa",
       "description": "Real estate agent toolkit — listing audit, listing copy generation, and buyer/seller communications.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "Automatic",
         "email": "david@automatic.so",

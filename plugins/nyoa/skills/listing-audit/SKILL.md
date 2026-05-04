@@ -1,11 +1,11 @@
 ---
 name: listing-audit
-description: Analyze any real estate listing and produce a strategic audit report and (optionally) a redesigned listing page. Use this skill whenever the user shares a property listing — by URL (Zillow, Realtor.com, Redfin, MLS), address, or pasted content — and wants to evaluate, fix, or rebuild it. Triggers on phrases like "audit this listing", "what's wrong with this listing", "rewrite this listing", "redo this listing page", or when the user simply pastes a listing URL.
+description: Analyze any real estate listing and produce a strategic audit report, a redesigned listing page (Markdown), and/or a polished HTML demo page with the original photos saved locally. Use this skill whenever the user shares a property listing — by URL (Zillow, Realtor.com, Redfin, Compass, MLS), address, or pasted content — and wants to evaluate, fix, rebuild, or generate a visual mock-up of it. Triggers on phrases like "audit this listing", "what's wrong with this listing", "rewrite this listing", "redo this listing page", "generate a demo listing page", "show me what it could look like", or when the user simply pastes a listing URL.
 ---
 
 # Listing Audit
 
-Read the listing the user shared, score it across a fixed rubric, and return a structured audit report. Optionally redesign the listing page.
+Read the listing the user shared, score it across a fixed rubric, and return a structured audit report. Optionally produce a redesigned listing page in Markdown, or a self-contained HTML demo page with the original photos saved locally.
 
 ## When this skill triggers
 
@@ -16,22 +16,54 @@ Read the listing the user shared, score it across a fixed rubric, and return a s
 
 ## What to produce
 
-By default, produce **only the audit report** (`assets/templates/audit-report.md`). Only produce the redesigned listing page (`assets/templates/redesigned-listing.md`) if the user explicitly asks for a rewrite or redesign.
+Three possible outputs. Pick based on what the user asked for; ask them if it's ambiguous:
+
+| Output | Template | When to produce |
+|---|---|---|
+| **Audit report** | `assets/templates/audit-report.md` | Default. Always produce this unless the user explicitly skips. |
+| **Redesigned listing (Markdown)** | `assets/templates/redesigned-listing.md` | When the user asks for a rewrite, rewrite, or "redo the copy". |
+| **Demo listing page (HTML)** | `assets/templates/listing-page.html` | When the user asks for a "demo page", "mock-up", "visual rebuild", "show me what it could look like", or wants something they can show a seller. Requires images — see Ingest. |
 
 ## Workflow
 
-### 1. Ingest
+### 1. Ingest — three tiers, try in order
 
-If the user shared a URL → fetch the page (use WebFetch). Pull:
-- Address, price, beds, baths, square footage, lot size, year built, days on market, status
-- MLS remarks / public description (verbatim)
-- Photo count + brief description of each photo if available
-- Listing agent name + brokerage
-- Any flags: price drops, back-on-market, contingencies
+The MLS portals (Zillow, Redfin, Realtor.com, Compass) render with JavaScript and aggressively block scrapers. Plain WebFetch will return shells of pages or login walls. Use this fallback ladder:
 
-If the user pasted text → ask them to confirm address + price, then proceed with what they gave you.
+#### Tier 1 — Firecrawl MCP (preferred when available)
 
-If the user only gave an address with no other info → ask for a URL or the MLS remarks before continuing. Do not invent property facts.
+If the Firecrawl MCP is installed (tools named `mcp__*__firecrawl_*`), use it. Firecrawl runs a real browser, handles JS rendering, and returns structured data + image URLs.
+
+- Use `firecrawl_extract` with a schema for: `address`, `price`, `beds`, `baths`, `sqft`, `lot_size`, `year_built`, `days_on_market`, `status`, `mls_remarks`, `listing_agent`, `brokerage`, `photo_urls` (array of full-resolution image URLs).
+- Fall back to `firecrawl_scrape` if extract fails — request `formats: ["markdown", "screenshot"]` and pull image URLs from the markdown.
+
+#### Tier 2 — WebFetch
+
+If no Firecrawl, try WebFetch. Works for some MLS / brokerage pages, fails on most consumer portals. If the response looks like a login wall, JavaScript stub, or "are you a robot" page, skip to Tier 3.
+
+#### Tier 3 — User paste
+
+Ask the user to paste the MLS remarks + the photo URLs (or upload photos directly). Confirm address + price before proceeding. Do not invent property facts.
+
+### 1b. Save the photos locally (only if producing the HTML demo page)
+
+Once you have photo URLs, save them under the user's current working directory:
+
+```
+./listings/<address-slug>/images/
+  ├── 01-hero.jpg
+  ├── 02-kitchen.jpg
+  ├── 03-livingroom.jpg
+  └── ...
+```
+
+- `<address-slug>` = lowercase, dash-separated address (e.g., `123-maple-st-east-nashville`).
+- Number the files in the order they appear in the listing (the first one is usually the hero).
+- Use Bash + `curl -L -o` for each URL. Add a `User-Agent` header (`-A "Mozilla/5.0"`) for portals that block default curl. Skip any that 403 — note them in the audit but don't fail the run.
+- Cap at 25 photos. If there are more, save the first 25.
+- After saving, list the local paths so the HTML template can reference them with relative paths (`./images/01-hero.jpg`).
+
+If you don't have photo URLs and the user can't paste them, skip the HTML demo page and tell the user explicitly (don't synthesize a demo page from stock photos).
 
 ### 2. Score across the rubric
 
@@ -60,11 +92,21 @@ Pull out 1–3 "kill issues" — the things hurting this listing the most. These
 
 Use `assets/templates/audit-report.md` as the structure. Fill it out completely. The report should be scannable — agent should be able to read it in under 90 seconds.
 
-### 5. (Optional) Write the redesigned listing
+### 5. (Optional) Write the redesigned listing — Markdown
 
 Only if the user asked for a rewrite. Use `assets/templates/redesigned-listing.md`. The redesign keeps every verifiable fact from the original (square footage, beds/baths, year built, etc.) and rewrites the narrative.
 
 If a per-agent voice file is available (`agents/<name>/voice.md` or wherever the user points), match that voice. Otherwise use NYOA house style: warm, specific, confident, no real-estate clichés ("nestled", "boasts", "must see", "luxury living awaits"), no fair-housing risk language.
+
+### 6. (Optional) Generate the demo HTML listing page
+
+Only if the user asked for a demo / mock-up / visual rebuild AND photos are available locally (step 1b). Use `assets/templates/listing-page.html` as the starting structure.
+
+- Copy the template to `./listings/<address-slug>/index.html`.
+- Substitute every `{{variable}}` with real values. The hero photo is `./images/01-hero.jpg`; gallery photos are `./images/02-*.jpg` through whatever the highest number is.
+- Use the redesigned MLS remarks (step 5) for the hero copy and the redesigned long description for the body. Don't reuse the old broken copy.
+- Inline all CSS in `<style>`. The HTML must work as a single file opened from the local filesystem (`file://...`).
+- After writing, tell the user the absolute path to the file so they can open it in a browser.
 
 ## Compliance guardrails
 
