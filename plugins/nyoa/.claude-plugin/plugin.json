@@ -1,0 +1,11 @@
+{
+  "name": "nyoa",
+  "version": "0.1.0",
+  "description": "NYOA — listing audit, listing copy in agent voice, and buyer/seller communications templates for real estate agents.",
+  "author": {
+    "name": "Automatic",
+    "email": "david@automatic.so",
+    "url": "https://davidflynn.co"
+  },
+  "keywords": ["real-estate", "nyoa", "listings", "mls", "agent", "comms"]
+}

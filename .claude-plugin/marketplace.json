@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "nyoa",
+  "description": "NYOA — Not Your Ordinary Agent. Preconfigured Claude for real estate agents.",
+  "owner": {
+    "name": "Automatic",
+    "email": "david@automatic.so"
+  },
+  "plugins": [
+    {
+      "name": "nyoa",
+      "source": "./plugins/nyoa",
+      "description": "Real estate agent toolkit — listing audit, listing copy generation, and buyer/seller communications.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Automatic",
+        "email": "david@automatic.so",
+        "url": "https://davidflynn.co"
+      },
+      "homepage": "https://github.com/flynndavid/nyoa-plugin",
+      "repository": "https://github.com/flynndavid/nyoa-plugin",
+      "license": "MIT",
+      "category": "real-estate",
+      "tags": ["real-estate", "nyoa", "listings", "agent", "comms", "mls"]
+    }
+  ]
+}
