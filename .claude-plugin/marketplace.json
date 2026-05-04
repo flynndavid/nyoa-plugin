@@ -11,7 +11,7 @@
       "name": "nyoa",
       "source": "./plugins/nyoa",
       "description": "Real estate agent toolkit — 8 AI skills: listing audit, listing copy, buyer/seller comms, AEO content, listing presentations, offer analysis, social content, and testimonial management.",
-      "version": "0.4.1",
+      "version": "0.4.2",
       "author": {
         "name": "Automatic",
         "email": "david@automatic.so",
