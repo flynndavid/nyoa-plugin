@@ -19,7 +19,7 @@ Required:
 - **Name** (or initials if anonymizing)
 - **Type**: buyer / seller / both / investor / renter
 
-Optional but improves cataloging (ask once, accept whatever the agent volunteers, don’t interrogate):
+Optional but improves cataloging (ask once, accept whatever the agent volunteers, don't interrogate):
 - Email, phone, preferred channel
 - Source (referral / sphere / Zillow / website / open house / other)
 - Stage (lead / nurturing / active / under-contract / closed)
@@ -34,13 +34,13 @@ Optional but improves cataloging (ask once, accept whatever the agent volunteers
 
 ### 1. Detect or scaffold the workspace
 
-If `nyoa-workspace/` doesn’t exist yet, create it from `plugins/nyoa/assets/workspace-template/` (top-level files only — no `_template/` subfolders). Tell the agent: "Workspace didn’t exist, I scaffolded one. Run `/nyoa-setup` later to fill in your business profile."
+If `nyoa-workspace/` doesn't exist yet, create it from `plugins/nyoa/assets/workspace-template/` (top-level files only — no `_template/` subfolders). Tell the agent: "Workspace didn't exist, I scaffolded one. Run `/nyoa-setup` later to fill in your business profile."
 
 ### 2. Slug + collision check
 
 Generate a slug from the name per the rule in `plugins/nyoa/references/context-formats.md` (lowercase, dash-separated, ASCII). If `nyoa-workspace/clients/<slug>/` already exists:
 
-- Confirm with the agent: same person? If yes, switch to update mode (modify existing files, don’t overwrite). If no, append `-2` (or next available number) to the slug.
+- Confirm with the agent: same person? If yes, switch to update mode (modify existing files, don't overwrite). If no, append `-2` (or next available number) to the slug.
 
 ### 3. Create the folder
 
@@ -48,7 +48,7 @@ Copy `plugins/nyoa/assets/workspace-template/clients/_template/` to `nyoa-worksp
 
 Files created:
 - `profile.md` — fill in everything the agent provided
-- `timeline.md` — add a first entry: today’s date, channel, "Client added to NYOA workspace."
+- `timeline.md` — add a first entry: today's date, channel, "Client added to NYOA workspace."
 - `preferences.md` — fill in whatever was shared; leave the rest blank
 - `documents.md` — empty table
 
@@ -66,18 +66,18 @@ Update the `Last updated:` stamp at the bottom of `pipeline.md`.
 
 ### 5. Cross-link a listing (sellers only)
 
-If the client is a seller and they mentioned a property address, also run a quick prompt: "Want me to create a listing folder for <address> too?" If yes, defer to `/nyoa-listing-new` (or scaffold inline using the same listing template) and link the client folder from `listings/<slug>/property.md` under `## Seller → Client folder`.
+If the client is a seller and they mentioned a property address, also run a quick prompt: "Want me to create a listing folder for <address> too?" If yes, defer to `/nyoa-listing-add` (or scaffold inline using the same listing template) and link the client folder from `listings/<slug>/property.md` under `## Seller → Client folder`.
 
 ### 6. Auto-save side-effects
 
 - If the agent provided a testimonial or referral source worth tracking, also append to `nyoa-context/proofs.md` (testimonials) per the testimonial-engine format.
 - If they mentioned a competitor by name, append to `nyoa-context/competitors.md`.
-- Don’t ask permission for these saves — confirm afterward.
+- Don't ask permission for these saves — confirm afterward.
 
 ## Compliance pass
 
-- **No protected-class language** in profile.md or preferences.md — "young family" → "household of [N]"; "good schools" → keep but don’t infer race/income; never write religion/national-origin/disability inferences.
-- **PII handling**: phone numbers, emails, lockbox codes, license #s are saved locally only. Don’t echo them back unnecessarily.
+- **No protected-class language** in profile.md or preferences.md — "young family" → "household of [N]"; "good schools" → keep but don't infer race / income; never write religion / national-origin / disability inferences.
+- **PII handling**: phone numbers, emails, lockbox codes, license #s are saved locally only. Don't echo them back unnecessarily.
 - **Source attribution**: always note where the lead came from — helps the agent see ROI by source later.
 
 ## Output format

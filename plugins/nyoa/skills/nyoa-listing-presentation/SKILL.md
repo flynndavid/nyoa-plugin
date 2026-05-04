@@ -23,7 +23,7 @@ Required:
 - **Property address**
 - **Approximate or target list price**
 - **Agent name and brokerage**
-- **3–5 comparable sales** — for each: address, sale price, days on market, and 1–2 key differences from the subject property (e.g., "smaller lot", "no pool", "updated kitchen")
+- **3-5 comparable sales** — for each: address, sale price, days on market, and 1-2 key differences from the subject property (e.g., "smaller lot", "no pool", "updated kitchen")
 
 Optional but improves output:
 - Agent voice file (for the narrative tone)
@@ -48,10 +48,10 @@ Determine voice in this order:
 1. Confirm the inputs. If comps or required fields are missing, ask once and wait. Check `nyoa-workspace/listings/<slug>/comps.md` and `property.md` first to avoid asking for data the agent already filed.
 2. Resolve voice mode.
 3. Build the **comparable sales summary table** (`assets/templates/comp-table.md`).
-4. Write the **market narrative** (`assets/templates/market-narrative.md`) — 2–3 paragraphs interpreting what the comps tell us about this market and this property's position.
+4. Write the **market narrative** (`assets/templates/market-narrative.md`) — 2-3 paragraphs interpreting what the comps tell us about this market and this property's position.
 5. Draft the **pricing strategy** (`assets/templates/pricing-strategy.md`) — recommended list price, price range, DOM expectation, strategic posture.
 6. Generate the **marketing plan** (`assets/templates/marketing-plan.md`) — what the agent will do to market this listing. Reference nyoa-listing-copy as a concrete deliverable.
-7. Write the **agent value proposition** (`assets/templates/agent-value-prop.md`) — 3–5 bullets on why this agent, backed by proof from `nyoa-context/proofs.md` if available.
+7. Write the **agent value proposition** (`assets/templates/agent-value-prop.md`) — 3-5 bullets on why this agent, backed by proof from `nyoa-context/proofs.md` if available.
 8. Assemble the **full presentation** — structured Markdown with all sections in order.
 9. Run the compliance pass.
 10. Write through to the workspace (see Workspace integration below).
@@ -76,18 +76,18 @@ If `nyoa-workspace/listings/<slug>/` exists for the address:
 - If new comps were provided in the conversation, append them to `comps.md` (don't overwrite existing rows).
 - Refresh `pipeline.md` last-activity date for the listing.
 
-If the folder doesn't exist, ask: "Want me to create `listings/<slug>/` so this presentation, comps, and future copy live together?" Defer to `/nyoa-listing-new` if yes; skip silently if no.
+If the folder doesn't exist, ask: "Want me to create `listings/<slug>/` so this presentation, comps, and future copy live together?" Defer to `/nyoa-listing-add` if yes; skip silently if no.
 
 ## Output format
 
 Single Markdown response with clear `##` headings for each section. Each section independently copyable. Sections in order:
 
-1. **Cover** — property address, agent name/brokerage, date
-2. **Market Narrative** — 2–3 paragraphs interpreting current market conditions for this property's neighborhood and price tier
+1. **Cover** — property address, agent name / brokerage, date
+2. **Market Narrative** — 2-3 paragraphs interpreting current market conditions for this property's neighborhood and price tier
 3. **Comparable Sales** — table with address, sale price, DOM, key differences, and how each comp supports the pricing recommendation
 4. **Pricing Strategy** — recommended list price, price range, DOM expectation, strategic rationale
 5. **Marketing Plan** — bullet-point outline of what the agent will do (photography, NYOA copy package, social campaigns, email blast, open house, syndication)
-6. **Why [Agent Name]** — 3–5 proof-backed reasons to choose this agent (pull from `nyoa-context/proofs.md` if available)
+6. **Why [Agent Name]** — 3-5 proof-backed reasons to choose this agent (pull from `nyoa-context/proofs.md` if available)
 7. **Timeline & Next Steps** — what happens after the seller signs (photography day, listing live date, first open house, first showing feedback report)
 
 End with: "Voice used: <agent name | NYOA house>." If workspace write-through ran, also confirm: "Saved to nyoa-workspace/listings/<slug>/presentation-<YYYY-MM-DD>.md."

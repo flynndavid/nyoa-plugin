@@ -9,19 +9,19 @@ The lowest-friction way to keep the workspace current. The agent says one senten
 
 ## When this skill triggers
 
-- "I just talked to Jane about Tuesday’s showing"
+- "I just talked to Jane about Tuesday's showing"
 - "Log: showed 123 Maple to the Smiths, lukewarm"
-- "Add to timeline for Jane: she’s pre-approved at $650k"
+- "Add to timeline for Jane: she's pre-approved at $650k"
 - "Note that the inspection on 4521 Lookout came back with a roof issue"
 - Phrases: "log", "just talked", "just showed", "record", "note that"
 
 ## Inputs you need
 
-The agent’s sentence. Parse it.
+The agent's sentence. Parse it.
 
 Required (extract or ask):
-- **Subject**: which client and/or which listing
-- **What happened**: 1–3 sentences
+- **Subject**: which client and / or which listing
+- **What happened**: 1-3 sentences
 
 Optional:
 - Channel (call / text / email / in-person / showing / other)
@@ -39,8 +39,8 @@ Match against existing folders:
 
 If no match:
 
-- Ask: "I don’t have <name> in your workspace yet — want me to run `/nyoa-client-add` first?"
-- Or for an address: `/nyoa-listing-new`.
+- Ask: "I don't have <name> in your workspace yet — want me to run `/nyoa-client-add` first?"
+- Or for an address: `/nyoa-listing-add`.
 
 If the entry mentions both a client and a listing (e.g., "showed 123 Maple to the Smiths"), log to **both** timelines so cross-referencing works later.
 
@@ -83,15 +83,15 @@ Closed deals trigger a follow-up suggestion: "Want me to draft a review request 
 
 ### 5. Auto-side-effects
 
-- If the log includes a referral mention ("they were referred by Mark"), append to that source’s context (a future feature, but at minimum note in the client’s profile.md under `Source:`).
+- If the log includes a referral mention ("they were referred by Mark"), append to that source's context (a future feature, but at minimum note in the client's profile.md under `Source:`).
 - If the log includes a testimonial-shaped quote ("they said working with me was the best part"), prompt: "Sounds like a testimonial — save to proofs.md?" If yes, run `/nyoa-testimonial-engine` ingestion.
 - If the log mentions a competitor agent by name, append a neutral note to `nyoa-context/competitors.md`.
 
 ## Compliance pass
 
-- Don’t embellish what the agent said. Faithful capture only.
+- Don't embellish what the agent said. Faithful capture only.
 - No protected-class language in logs ("young couple" → "couple"; "Spanish-speaking buyer" only if relevant to representation needs and noted neutrally).
-- Don’t auto-share logs anywhere external.
+- Don't auto-share logs anywhere external.
 
 ## Output format
 

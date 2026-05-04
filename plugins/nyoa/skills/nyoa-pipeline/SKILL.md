@@ -10,7 +10,7 @@ The single command for the agent to see, edit, and act on their book of business
 ## When this skill triggers
 
 - "Show my pipeline" / "what am I working on" / "how many active deals do I have"
-- "Who haven’t I followed up with" / "stale leads" / "clean up my pipeline"
+- "Who haven't I followed up with" / "stale leads" / "clean up my pipeline"
 - "Move <Jane> to under-contract" / "close out <address>"
 - Phrases: "pipeline", "deals", "book", "active"
 
@@ -22,11 +22,11 @@ Nothing required. The skill reads the workspace. The agent may follow up with ed
 
 ### 1. Read state
 
-- Read `nyoa-workspace/pipeline.md`. If it doesn’t exist, ask the agent to run `/nyoa-setup` (or `/nyoa-client-add` / `/nyoa-listing-new`) first.
+- Read `nyoa-workspace/pipeline.md`. If it doesn't exist, ask the agent to run `/nyoa-setup` (or `/nyoa-client-add` / `/nyoa-listing-add`) first.
 - For each entry, follow the link to the canonical folder. Read:
   - For clients: `clients/<slug>/profile.md` (stage), `timeline.md` (last entry timestamp).
   - For listings: `listings/<slug>/property.md` (status, list date), `showings.md` last entry, `offers.md` last entry.
-- Compute “last activity” as the most recent timestamp across the relevant logs.
+- Compute "last activity" as the most recent timestamp across the relevant logs.
 
 ### 2. Summarize
 
@@ -35,7 +35,7 @@ Return a stage-by-stage table:
 ```
 ## Pipeline summary (as of YYYY-MM-DD)
 
-| Stage | Count | Hot (≤7d) | Warm (8–21d) | Stale (>21d) |
+| Stage | Count | Hot (≤7d) | Warm (8-21d) | Stale (>21d) |
 |-------|-------|----------|-------------|---------------|
 | Leads | N | n | n | n |
 | Active | N | n | n | n |
@@ -47,7 +47,7 @@ Below the table, list the entries grouped by stage with last-activity dates and 
 
 ### 3. Surface stale entries
 
-Define stale as: lead with no activity >14 days, active with no activity >7 days, listing on market >30 days with no recent showings, under-contract with no activity >5 days during the contingency window. Tune to taste based on what the agent’s feedback.md says.
+Define stale as: lead with no activity >14 days, active with no activity >7 days, listing on market >30 days with no recent showings, under-contract with no activity >5 days during the contingency window. Tune to taste based on what the agent's feedback.md says.
 
 For each stale entry, propose one concrete follow-up:
 
@@ -61,24 +61,24 @@ For each stale entry, propose one concrete follow-up:
 Accept these in plain language and rewrite `pipeline.md` accordingly:
 
 - **Move stage**: "move Jane to under-contract" → remove from old section, append to new section, append a `timeline.md` entry, refresh `Last updated:` stamp.
-- **Update next step**: "Jane next step is send disclosures by Friday" → update the entry’s `next:` clause.
+- **Update next step**: "Jane next step is send disclosures by Friday" → update the entry's `next:` clause.
 - **Mark closed**: triggers a follow-up suggestion — "Run `/nyoa-testimonial-engine` to draft a review request."
-- **Remove**: "drop Jane from pipeline" → ask for confirmation; if yes, move to `## On hold / nurture` (don’t delete the folder).
+- **Remove**: "drop Jane from pipeline" → ask for confirmation; if yes, move to `## On hold / nurture` (don't delete the folder).
 
 Never delete a client or listing folder — stage moves are pipeline-only.
 
 ### 5. Calendar + tasks integration
 
-If an entry’s `next:` clause includes a date, also append to `nyoa-workspace/calendar.md` and `tasks.md`. If `nyoa-context/connectors.md` shows google-calendar or a CRM is wired up, suggest syncing there too — don’t auto-sync without confirmation.
+If an entry's `next:` clause includes a date, also append to `nyoa-workspace/calendar.md` and `tasks.md`. If `nyoa-context/connectors.md` shows google-workspace is wired up, suggest syncing the deadline as a Calendar event — don't auto-sync without confirmation.
 
 ## Compliance pass
 
-- Don’t echo PII in the summary unless the agent’s screen is private (assume it isn’t — use first names + last initial in summaries).
-- Stage moves involving "closed" should be paired with a referral/review prompt; don’t skip that nudge.
+- Don't echo PII in the summary unless the agent's screen is private (assume it isn't — use first names + last initial in summaries).
+- Stage moves involving "closed" should be paired with a referral / review prompt; don't skip that nudge.
 
 ## Output format
 
-Markdown summary table, then per-stage entries, then “Stale entries needing follow-up”, then any edits performed in this run.
+Markdown summary table, then per-stage entries, then "Stale entries needing follow-up", then any edits performed in this run.
 
 End with: `Voice used: NYOA house`.
 
