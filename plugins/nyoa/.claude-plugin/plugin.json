@@ -1,7 +1,7 @@
 {
   "name": "nyoa",
-  "version": "0.5.0",
-  "description": "NYOA — a real estate operating system for Claude. 15 AI skills covering onboarding, daily workflow (clients, listings, pipeline, weekly review, interaction log, connectors), and content (listing audit + photo download + HTML demo, listing copy, buyer/seller comms, AEO content, listing presentations, offer analysis, social content, testimonial management).",
+  "version": "0.6.0",
+  "description": "NYOA — a real estate operating system for Claude. 19 AI skills: workspace abstraction with schema versioning and migrate/resume modes, help system with 6 workflow recipes, workspace hygiene (doctor/find/archive), daily workflow (clients, listings, pipeline with rolling sections, weekly review, interaction log, connectors), and content (listing audit, listing copy, buyer/seller comms, AEO content, listing presentations, offer analysis, social content, testimonial management).",
   "author": {
     "name": "Automatic",
     "email": "david@automatic.so",

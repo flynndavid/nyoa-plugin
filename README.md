@@ -1,15 +1,19 @@
 # NYOA — Not Your Ordinary Agent
 
-A preconfigured Claude for real estate agents — a real operating system for your day-to-day, not just a content tool. Install once, get **15 skills + a local workspace + an onboarding flow** that handles the work agents do every day.
+A preconfigured Claude for real estate agents — a real operating system for your day-to-day, not just a content tool. Install once, get **19 skills + a local workspace + an onboarding flow** that handles the work agents do every day.
 
-### Onboarding & daily workflow (new in v0.5.0)
-- **`/nyoa-setup`** — Guided onboarding. Interview-style first run that populates your `nyoa-context/` (profile, voice, proofs, competitors) and scaffolds your `nyoa-workspace/` (clients, listings, pipeline, calendar, tasks). Run this first.
+### Onboarding, daily workflow & workspace hygiene
+- **`/nyoa-setup`** — Guided onboarding. 8-round interview that populates your `nyoa-context/` (profile, voice, proofs, competitors) and scaffolds your `nyoa-workspace/`. Supports `$ARGUMENTS` modes: `/nyoa-setup resume`, `/nyoa-setup migrate`, `/nyoa-setup voice`, `/nyoa-setup identity`, and more. Run this first.
 - **`/nyoa-client-add`** — Add a buyer / seller / lead. Creates a structured client folder (profile, timeline, preferences, documents) and registers them on the pipeline.
 - **`/nyoa-listing-add`** — Add a new listing. Creates a structured property folder (facts, copy, comps, showings, offers, photos) and registers it on the pipeline.
-- **`/nyoa-pipeline`** — See and edit your book of business. Stage-by-stage summary, surfaces stale leads, lets you move clients between stages.
+- **`/nyoa-pipeline`** — See and edit your book of business. Stage-by-stage summary, surfaces stale leads, lets you move clients between stages. Writes rolling "Recent logs" and "Stale items" sections to `pipeline.md` on each run.
 - **`/nyoa-weekly-review`** — Friday wrap-up + Monday plan. Reads your week and writes a one-pager: wins, slips, top 3 next week, overdue follow-ups.
-- **`/nyoa-log`** — "I just talked to Jane about Tuesday's showing." Lowest-friction way to keep timelines current; auto-routes to the right client / listing folder.
+- **`/nyoa-log`** — "I just talked to Jane about Tuesday's showing." Lowest-friction way to keep timelines current; auto-routes to the right client / listing folder and refreshes the pipeline's recent-activity feed.
 - **`/nyoa-connect`** — Detect which MCP integrations you have (Google Workspace, Notion, Slack, Firecrawl, etc.) and document them so other skills can branch on availability. Honest about what we know exists — never names made-up integrations.
+- **`/nyoa-help`** — The NYOA help system. Lists skills filtered by your workspace state, explains any skill on demand, and displays step-by-step workflow recipes. Try `/nyoa-help workflow new-buyer` or `/nyoa-help workflow new-listing`.
+- **`/nyoa-doctor`** — Workspace health check. Audits schema version, setup completeness, connectors state, and stale pipeline items. Tells you exactly what's missing and what to run to fix it.
+- **`/nyoa-find`** — Search your entire workspace. Grep across all markdown in `nyoa-workspace/` and `nyoa-context/` and get matches with file paths and surrounding context.
+- **`/nyoa-archive`** — Clean up your pipeline view. Moves Closed entries older than 90 days to an Archive section in `pipeline.md`. Folders are never touched.
 
 ### Listing workflow
 - **`/nyoa-listing-presentation`** — Win the listing appointment. Generate a complete seller pitch: market narrative from your comps, comp summary table, pricing strategy with rationale, marketing plan, and "Why Me" section. Reads `nyoa-workspace/` for property facts + filed comps.
@@ -29,18 +33,25 @@ All skills enforce **Fair Housing compliance** automatically (no protected-class
 
 ---
 
+## What's new in v0.6.0
+
+v0.6 lays the architectural foundation for everything that comes next — workspace abstraction, schema versioning, a help system, and hygiene tools so the workspace stays useful over time.
+
+- **Workspace schema versioning** — `nyoa-context/_meta.json` tracks `schema_version`, `workspace.backend`, and setup state. Future backends (Google Drive, Notion) can be added in v0.7 without changing any skill code.
+- **Setup refactor** — `/nyoa-setup` now has 8 rounds (new Round 1 confirms the workspace location) and supports `$ARGUMENTS` dispatch: `/nyoa-setup resume` picks up where you left off; `/nyoa-setup migrate` upgrades a v0.5.x workspace non-destructively; `/nyoa-setup voice`, `/nyoa-setup identity`, and other per-round modes let you update any piece without re-running the full interview.
+- **Help system** — `/nyoa-help` lists relevant skills filtered by what's active in your workspace, explains any skill on demand, and serves 6 step-by-step workflow recipes (new-buyer, new-listing, under-contract, open-house, listing-not-selling, first-month).
+- **Hygiene tools** — `/nyoa-doctor` audits schema, setup completeness, connectors, and stale items. `/nyoa-find` greps your entire workspace. `/nyoa-archive` retires old closed deals to an archive section in pipeline.md — folders untouched.
+- **Rolling pipeline sections** — `/nyoa-pipeline` and `/nyoa-log` now maintain a "Recent logs (last 7d)" and "Stale items" feed at the bottom of `pipeline.md`, so every session starts with full context.
+- **Capability requirements** — all 8 content skills now declare which external capabilities they use (email, calendar, docs, sms, crm, web-scrape) and follow a consistent connector-branching rule: stated preference wins; if ambiguous, the skill asks; if nothing available, it falls back to file-only behavior.
+- **SessionStart hook enhanced** — the session-start script now also nudges to `/nyoa-setup migrate` if it detects a v0.5.x workspace (no `_meta.json`).
+
+### Upgrading from v0.5.0
+
+Run `/nyoa-setup migrate` in your workspace directory. It takes under a minute and is fully non-destructive — backups land in `nyoa-workspace/.backups/v0.5-to-v0.6/<date>/`.
+
 ## What's new in v0.5.0
 
 NYOA grew from a content toolbelt into a real estate operating system. The big shift: every skill now has a **place to put things** (`nyoa-workspace/`) and a **way to find what's already there** (`nyoa-context/`). Past sessions compound; future sessions start with full context.
-
-New capabilities:
-
-- **`nyoa-workspace/`** — a local markdown tree with `clients/`, `listings/`, `pipeline.md`, `calendar.md`, `tasks.md`, `templates/`, `reviews/`. Every new and existing skill reads / writes here when it's present.
-- **Onboarding** — `/nyoa-setup` interviews you once and you're set up.
-- **Daily workflow skills** — client / listing / pipeline / log / weekly-review for keeping the workspace current.
-- **Connector awareness** — `/nyoa-connect` records which MCPs you have so skills like `/nyoa-buyer-seller-comms` can offer to push drafts to Gmail directly (when the Google Workspace MCP is wired up).
-- **SessionStart nudge** — if Claude Code detects you have a NYOA workspace but no profile, you'll get a one-line reminder to run `/nyoa-setup`.
-- **Existing skills extended** — listing-copy, listing-presentation, social-content, and buyer-seller-comms now write through to the workspace when it exists. They fall back to the original inline-only behavior when it doesn't.
 
 ---
 
@@ -90,9 +101,9 @@ If they still don't appear, remove and re-add the marketplace using the same URL
 
 ## First time? Run these three things
 
-1. **`/nyoa-setup`** — 7 short rounds of questions. End state: your `nyoa-context/` and `nyoa-workspace/` are populated with your business identity and any active clients / listings.
+1. **`/nyoa-setup`** — 8 short rounds of questions. End state: your `nyoa-context/` and `nyoa-workspace/` are populated with your business identity and any active clients / listings. Interrupted mid-session? Run `/nyoa-setup resume` to pick up where you left off.
 2. **`/nyoa-connect`** — records which integrations you have (Google Workspace, Notion, Slack, Firecrawl) so other skills know what they can offer.
-3. **Pick the skill matching what's on your plate today** — listing appointment? `/nyoa-listing-presentation`. New listing going live? `/nyoa-listing-add` then `/nyoa-listing-copy`. Friday afternoon? `/nyoa-weekly-review`.
+3. **`/nyoa-help`** — see what's available and what NYOA recommends based on your workspace state. Or `/nyoa-help workflow first-month` for a 4-week onboarding ramp.
 
 From there, every interaction adds to your workspace. Future you (and future Claude sessions) will thank present you.
 
@@ -239,7 +250,9 @@ If auto-update is off, click **Update** on the NYOA marketplace card whenever yo
 
 **Listing audit can't read a Zillow page** — Zillow blocks most scrapers. Either install the Firecrawl MCP (handles JS rendering) or paste the MLS remarks + photo URLs into chat directly.
 
-**SessionStart nudge keeps appearing** — You have a NYOA workspace folder but `nyoa-context/profile.md` doesn't exist. Run `/nyoa-setup` to populate it; the nudge will stop.
+**SessionStart nudge keeps appearing (profile missing)** — You have a NYOA workspace folder but `nyoa-context/profile.md` doesn't exist. Run `/nyoa-setup` to populate it; the nudge will stop.
+
+**SessionStart nudge about v0.6 migration** — You have a v0.5.x workspace (no `nyoa-context/_meta.json`). Run `/nyoa-setup migrate` to upgrade; it takes under a minute and is non-destructive.
 
 **Anything else** — DM David (`david@automatic.so`).
 
@@ -257,16 +270,27 @@ nyoa-plugin/
     │   └── session-start.sh
     ├── assets/
     │   └── workspace-template/            # scaffolded by /nyoa-setup
+    │       └── nyoa-context/
+    │           └── _meta.json             # workspace manifest template (v0.6)
+    ├── migrations/
+    │   └── 0.6.0/index.md                 # v0.5.x → v0.6.0 migration guide
     ├── references/
-    │   └── context-formats.md             # nyoa-context/ + nyoa-workspace/ schemas
+    │   ├── context-formats.md             # nyoa-context/ + nyoa-workspace/ schemas
+    │   ├── workspace-io.md                # workspace I/O contract (v0.6)
+    │   ├── onboarding-prompts.md          # in-flow capture patterns
+    │   └── workflows/                     # 6 step-by-step workflow recipes
     └── skills/
-        ├── nyoa-setup/                    ← new in v0.5.0
-        ├── nyoa-client-add/               ← new in v0.5.0
-        ├── nyoa-listing-add/              ← new in v0.5.0
-        ├── nyoa-pipeline/                 ← new in v0.5.0
-        ├── nyoa-weekly-review/            ← new in v0.5.0
-        ├── nyoa-log/                      ← new in v0.5.0
-        ├── nyoa-connect/                  ← new in v0.5.0
+        ├── nyoa-setup/                    ← refactored in v0.6.0
+        ├── nyoa-client-add/
+        ├── nyoa-listing-add/
+        ├── nyoa-pipeline/                 ← rolling sections added in v0.6.0
+        ├── nyoa-weekly-review/
+        ├── nyoa-log/                      ← recent-logs refresh added in v0.6.0
+        ├── nyoa-connect/                  ← v0.6 connectors format
+        ├── nyoa-help/                     ← new in v0.6.0
+        ├── nyoa-doctor/                   ← new in v0.6.0
+        ├── nyoa-find/                     ← new in v0.6.0
+        ├── nyoa-archive/                  ← new in v0.6.0
         ├── nyoa-listing-audit/
         ├── nyoa-listing-copy/
         ├── nyoa-buyer-seller-comms/
