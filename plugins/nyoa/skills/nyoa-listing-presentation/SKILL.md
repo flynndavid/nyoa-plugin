@@ -45,6 +45,14 @@ Determine voice in this order:
 
 ## Workflow
 
+### Capability requirements
+
+Read `nyoa-context/connectors.md`. If user has a stated preference for a capability, use the corresponding connector. If multiple connectors are available and no preference is set, ask which to use. If none are available, fall back to file-only behavior.
+
+- **docs** (`google-workspace` or `notion`): When available, NYOA offers to save the presentation to Drive or a Notion page in addition to the local workspace write-through. Falls back to inline Markdown + `nyoa-workspace/listings/<slug>/presentation-<YYYY-MM-DD>.md`.
+- **email** (`google-workspace` or `outlook`): When available, NYOA offers to push the presentation (or a link to it) to the agent's email client for delivery to the seller. Falls back to delivering the draft inline for manual send.
+- No other external capabilities required — all narrative generation, comp analysis, and pricing strategy are local.
+
 1. Confirm the inputs. If comps or required fields are missing, ask once and wait. Check `nyoa-workspace/listings/<slug>/comps.md` and `property.md` first to avoid asking for data the agent already filed.
 2. Resolve voice mode.
 3. Build the **comparable sales summary table** (`assets/templates/comp-table.md`).

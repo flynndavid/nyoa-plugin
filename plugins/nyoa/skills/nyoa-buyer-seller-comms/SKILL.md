@@ -18,6 +18,18 @@ Generate the messages an agent sends every week. SMS, email, or voicemail script
 - "Ask [past client] for a referral"
 - "Follow up on the [property] showing from yesterday"
 
+## Workflow
+
+### Capability requirements
+
+Read `nyoa-context/connectors.md`. If user has a stated preference for a capability, use the corresponding connector. If multiple connectors are available and no preference is set, ask which to use. If none are available, fall back to file-only behavior.
+
+- **email** (`google-workspace` or `outlook`): When available, NYOA offers to push email drafts directly to the agent's email client (Gmail / Outlook). Always confirm before sending — never auto-send.
+- **calendar** (`google-workspace` or `outlook`): When the message references a showing, follow-up, or appointment time, NYOA offers to create a calendar event. Falls back to appending to `nyoa-workspace/calendar.md`.
+- **sms**: When a verified SMS MCP is available, NYOA offers to send SMS drafts via the agent's SMS tool. Falls back to delivering the draft inline for manual send.
+- **crm**: When a CRM connector is available, NYOA offers to log the sent message as a note on the contact record. Falls back to appending to `clients/<slug>/timeline.md`.
+- If none of the above are available, deliver the draft inline as Markdown — same as today.
+
 ## Templates available
 
 Buyer-side:

@@ -47,6 +47,11 @@ Full specs: `references/article-types.md`. Exact prompts: `references/prompts.md
 
 ## Workflow
 
+### Capability requirements
+
+- **web-scrape** (`firecrawl` or `puppeteer`): When available, NYOA can fetch competitor URLs and research source pages directly instead of relying on agent-pasted content. Read `nyoa-context/connectors.md`. If the agent has a stated preference for a web-scrape connector, use it. If none is available, fall back to agent-pasted content or URLs the agent provides manually.
+- No other external capabilities required — all content generation and context writes are local.
+
 ### 1. Load context
 
 Check for `nyoa-context/` in the working directory. Read any existing files:

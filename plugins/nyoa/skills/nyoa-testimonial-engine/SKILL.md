@@ -31,6 +31,13 @@ Optional but improves cataloging:
 
 ## Workflow
 
+### Capability requirements
+
+Read `nyoa-context/connectors.md`. If user has a stated preference for a capability, use the corresponding connector. If none is available, fall back to file-only behavior.
+
+- **email** (`google-workspace` or `outlook`): When available, NYOA offers to push the review-request email directly to the agent's email client, pre-addressed to the past client. Always confirm before sending — never auto-send. Falls back to delivering the draft inline for the agent to send manually.
+- No other external capabilities required — testimonial ingestion, cataloging, repurposing, and proof bank queries are all local.
+
 ### 1. Ingest and catalog
 
 Accept the testimonial. Extract:

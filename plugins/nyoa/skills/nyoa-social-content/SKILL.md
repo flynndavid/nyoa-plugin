@@ -56,6 +56,13 @@ For a week of content (5 posts default), select from these categories. No more t
 
 ## Workflow
 
+### Capability requirements
+
+This skill generates copy for social platforms; the agent handles publishing manually. No external capabilities are required — all content generation and workspace writes are local.
+
+- No connectors used — output is always inline text in a content calendar format, ready for the agent to paste into their platform of choice.
+- Reading `nyoa-context/connectors.md` is not required for this skill, though the skill may read it if checking for other context.
+
 1. Read voice file and/or `nyoa-context/profile.md` if available. Understand the agent's niche, market, and tone.
 2. (Optional) Read `nyoa-workspace/reviews/` for recent wins/learnings to source Behind-the-Scenes posts; read `nyoa-workspace/listings/*/property.md` for an active listing to source a Neighborhood Spotlight.
 3. Select the content mix — 5 posts from different categories. No more than 2 of the same type.

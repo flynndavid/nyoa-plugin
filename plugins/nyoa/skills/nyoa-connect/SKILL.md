@@ -29,6 +29,10 @@ If the agent asks about a tool we can't verify (a specific CRM, MLS portal, e-si
 
 ## Workflow
 
+### Capability requirements
+
+This skill uses no external capabilities — it writes local files only and reads the session's tool list.
+
 ### 1. Detect available MCP tool namespaces in the current session
 
 Look at the tool list available in this session. Match against the verified-real catalogue below. The detection keyword is a substring on the tool name; the namespace prefix may vary by install.
@@ -49,7 +53,15 @@ Also note availability of the built-ins `WebFetch` and `WebSearch` — these are
 
 Do not check for or list any other connector by name. If the agent asks about Gmail / Calendar / Drive specifically, the answer is "check Google's official Workspace MCP"; we don't name third-party Gmail MCPs because their authorship and maintenance status varies.
 
-### 2. Ask about tool categories we can't auto-detect
+### 2. Ask about stated preferences
+
+When detection is complete, ask the agent about their day-to-day tool preferences. This is important when (a) multiple connectors of the same type are available (e.g., both Google Workspace and Notion are detected), or (b) the agent uses a tool that has no verified MCP (so NYOA knows what to label the fallback):
+
+> "Which of these do you use as your primary day-to-day email: [list detected options, or 'none detected']? And for calendar: [...]? And for docs/cloud storage: [...]? This helps NYOA know which tool to offer first when generating drafts."
+
+Record what the agent says. These go into the `## User-stated preferences` section of `connectors.md`. If the agent says "I don't know" or "it doesn't matter", record `not-set` for that category.
+
+### 3. Ask about tool categories we can't auto-detect
 
 For categories where there is **no verified public MCP** as of this skill's last update, ask the agent in plain language so we can capture their workflow gap (not their MCP install). One short list:
 
@@ -57,22 +69,28 @@ For categories where there is **no verified public MCP** as of this skill's last
 
 For each category the agent uses, record `tool: <name>` and `mcp: not-verified-as-of-2025`. Other skills will fall back to file-only behavior.
 
-### 3. Write `nyoa-context/connectors.md`
+### 4. Write `nyoa-context/connectors.md`
 
-Use the format defined in `plugins/nyoa/references/context-formats.md`. Always overwrite the file in full — it's canonical state, not a log.
+Use the format defined in `plugins/nyoa/references/context-formats.md`. Always overwrite the file in full — it's canonical state, not a log. The v0.6 format includes: Detected, Built-in tools, unverified stack, User-stated preferences, NYOA usage, and Notes.
 
 ```markdown
 # Connectors
 
+The MCP servers / external tools this agent has available, captured by `/nyoa-connect`.
+Other skills branch on this — skills declare which **capability** they need; this file records what's wired up and what the agent prefers.
+
 ## Detected (verified MCPs available in this session)
-- google-workspace: yes — namespace: <observed prefix>
-- firecrawl: yes — namespace: mcp__firecrawl__*
-- slack: no
-- notion: no
+- google-workspace: [yes / no] — namespace: <observed prefix, e.g. mcp__google__*>
+- firecrawl: [yes / no] — namespace: <observed prefix>
+- slack: [yes / no] — namespace: <observed prefix>
+- notion: [yes / no] — namespace: <observed prefix>
+- github: [yes / no] — namespace: <observed prefix>
+- brave-search: [yes / no] — namespace: <observed prefix>
+- puppeteer: [yes / no] — namespace: <observed prefix>
 
 ## Built-in tools
-- WebFetch: yes
-- WebSearch: yes
+- WebFetch: [yes / no]
+- WebSearch: [yes / no]
 
 ## Stack we tracked but can't verify a public MCP for
 - crm: <name agent uses or "none"> — mcp: not-verified-as-of-2025
@@ -80,14 +98,30 @@ Use the format defined in `plugins/nyoa/references/context-formats.md`. Always o
 - sms: <name or "none"> — mcp: not-verified-as-of-2025
 - mls: <name or "none"> — mcp: not-verified-as-of-2025
 
+## User-stated preferences
+- email: <google-workspace | outlook | none | not-set>
+- calendar: <google-workspace | outlook | none | not-set>
+- docs: <google-workspace | notion | none | not-set>
+- sms: <tool name or "none">
+- crm: <tool name or "none">
+- team-comms: <slack | none | not-set>
+
+## NYOA usage (what NYOA does when each capability is present)
+- email: nyoa-buyer-seller-comms and nyoa-listing-copy offer to push drafts directly to the agent's email client
+- calendar: nyoa-pipeline and nyoa-weekly-review offer to sync deadlines and showings as calendar events
+- docs: nyoa-listing-copy, nyoa-listing-presentation can save canonical copies to cloud storage
+- sms: nyoa-buyer-seller-comms offers to send SMS drafts via the agent's SMS tool
+- crm: nyoa-log and nyoa-buyer-seller-comms offer to log interactions to the CRM contact record
+- web-scrape: nyoa-listing-audit uses Firecrawl or Puppeteer for Zillow/Redfin/Realtor.com scrapes
+- team-comms: future — not yet used by any skill
+
 ## Notes
-- Default email send-from: <agent's email if Google Workspace MCP is wired and they shared it>
-- Default calendar: <which calendar to write events to if multiple>
+- (any agent-specific configuration that other skills should know)
 
 Last updated: YYYY-MM-DD
 ```
 
-### 4. For each missing verified MCP, give an honest install hint
+### 6. For each missing verified MCP, give an honest install hint
 
 Keep it short and only point to first-party sources:
 
@@ -98,7 +132,7 @@ Keep it short and only point to first-party sources:
 
 For categories without a verified MCP (CRM, e-sign, SMS, MLS): tell the agent honestly that we don't know of a publicly-verified server, and the fallback in NYOA is markdown-in-workspace plus the agent's native tool. No name-dropping of unverified servers.
 
-### 5. Tell the agent how the inventory changes their experience
+### 7. Tell the agent how the inventory changes their experience
 
 After writing `connectors.md`, summarize the impact:
 
@@ -107,7 +141,7 @@ After writing `connectors.md`, summarize the impact:
 - Notion detected → "You can mirror `nyoa-workspace/` content into Notion if you prefer that as your daily UI. Other skills still write to `nyoa-workspace/` as the source of truth."
 - No CRM / no e-sign / no SMS / no MLS MCP → "Those workflows stay file-based in `nyoa-workspace/` for now. Update via paste / export / manual logging."
 
-### 6. Re-run friendly
+### 8. Re-run friendly
 
 This skill is idempotent. Re-running picks up newly-installed MCPs and updates `connectors.md`. Encourage the agent to re-run after any MCP config change.
 

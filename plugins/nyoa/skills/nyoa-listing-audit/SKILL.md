@@ -26,6 +26,13 @@ Three possible outputs. Pick based on what the user asked for; ask them if it's 
 
 ## Workflow
 
+### Capability requirements
+
+Read `nyoa-context/connectors.md`. If user has a stated preference for a web-scrape connector, use it. If multiple web-scrape connectors are available and no preference is set, prefer Firecrawl over Puppeteer (better structured output). If none are available, fall back to agent paste.
+
+- **web-scrape** (`firecrawl` or `puppeteer`): Required for fetching listing pages from Zillow, Redfin, Realtor.com, and Compass, which render with JavaScript and block plain HTTP fetches. Firecrawl is preferred; Puppeteer is the secondary fallback. If neither is available, ask the agent to paste the MLS remarks and photo URLs directly (Tier 3 ingest).
+- No other external capabilities required — all audit analysis, report writing, and HTML generation are local.
+
 ### 1. Ingest — three tiers, try in order
 
 The MLS portals (Zillow, Redfin, Realtor.com, Compass) render with JavaScript and aggressively block scrapers. Plain WebFetch will return shells of pages or login walls. Use this fallback ladder:

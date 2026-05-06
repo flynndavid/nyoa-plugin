@@ -11,6 +11,7 @@ Any skill can read from and write to either tree.
 
 ```
 nyoa-context/
+├── _meta.json      # Schema version, workspace backend, setup state (written by /nyoa-setup)
 ├── profile.md      # Business identity — name, services, locations, differentiators
 ├── voice.md        # Tone and style preferences for the agent's brand voice
 ├── proofs.md       # Testimonials, awards, stats, certifications
@@ -19,7 +20,7 @@ nyoa-context/
 └── connectors.md   # Which MCPs / external tools the agent has wired up (written by /nyoa-connect)
 ```
 
-The directory starts empty and builds organically. `/nyoa-setup` is the fastest way to populate it.
+The directory starts empty and builds organically. `/nyoa-setup` is the fastest way to populate it. `_meta.json` is created by `/nyoa-setup` and is the sole file that carries `schema_version`.
 
 ## nyoa-workspace/ — directory structure
 
@@ -45,6 +46,43 @@ Lowercase, dash-separated, ASCII only. Strip punctuation. Examples:
 - `123 Maple St, East Nashville` → `123-maple-st-east-nashville`
 
 If a slug already exists, append `-2`, `-3`, etc.
+
+## _meta.json format
+
+`nyoa-context/_meta.json` is the workspace manifest. It is the only file in `nyoa-context/` that carries `schema_version`. Other context files are human-edited markdown with no version field.
+
+```json
+{
+  "schema_version": "0.6.0",
+  "installed_at": "YYYY-MM-DD",
+  "setup": {
+    "setup_complete": false,
+    "setup_last_round_completed": 0,
+    "setup_completed_at": null
+  },
+  "workspace": {
+    "backend": "local",
+    "root_path": "."
+  },
+  "agent": {
+    "name": null,
+    "brokerage": null
+  }
+}
+```
+
+Field reference:
+- `schema_version` — the NYOA plugin version that wrote this file. Used by the session-start hook and `/nyoa-setup migrate` to detect stale workspaces.
+- `installed_at` — ISO date (YYYY-MM-DD) when the workspace was first created.
+- `setup.setup_complete` — `true` once all setup rounds are finished.
+- `setup.setup_last_round_completed` — integer 0–8; used by `/nyoa-setup resume` to pick up mid-session.
+- `setup.setup_completed_at` — ISO date or null.
+- `workspace.backend` — always `"local"` in v0.6. Reserved values: `"gdrive"`, `"notion"` (v0.7+).
+- `workspace.root_path` — `"."` for local backend (relative to cwd). Non-local backends will use a URI.
+- `agent.name` — agent's full marketing name; populated in Setup Round 2.
+- `agent.brokerage` — brokerage name; populated in Setup Round 2.
+
+Skills must write `_meta.json` as valid JSON. Never write markdown to this file.
 
 ## Which skills read/write each context file
 
@@ -166,23 +204,49 @@ Tags: [service types this testimonial supports]
 - [Date]: [Preference noted]
 ```
 
-### connectors.md (new)
+### connectors.md (v0.6 format)
 
 ```markdown
 # Connectors
 
 The MCP servers / external tools this agent has available, captured by `/nyoa-connect`.
-Other skills branch on this — e.g., if `gmail: yes`, `nyoa-buyer-seller-comms` can offer to send drafts directly.
+Other skills branch on this — skills declare which **capability** they need; this file records what's wired up and what the agent prefers.
 
-## Available
-- gmail: [yes / no] — server name: <e.g., mcp__gmail__*>
-- google-calendar: [yes / no]
-- google-drive: [yes / no]
-- docusign: [yes / no]
-- twilio (sms): [yes / no]
-- crm: [name / no] — e.g., follow-up-boss, hubspot, salesforce
-- mls: [name / no]
-- firecrawl: [yes / no]
+## Detected (verified MCPs available in this session)
+- google-workspace: [yes / no] — namespace: <observed prefix, e.g. mcp__google__*>
+- firecrawl: [yes / no] — namespace: <observed prefix>
+- slack: [yes / no] — namespace: <observed prefix>
+- notion: [yes / no] — namespace: <observed prefix>
+- github: [yes / no] — namespace: <observed prefix>
+- brave-search: [yes / no] — namespace: <observed prefix>
+- puppeteer: [yes / no] — namespace: <observed prefix>
+
+## Built-in tools
+- WebFetch: [yes / no]
+- WebSearch: [yes / no]
+
+## Stack we tracked but can't verify a public MCP for
+- crm: <name agent uses or "none"> — mcp: not-verified-as-of-2025
+- e-sign: <name or "none"> — mcp: not-verified-as-of-2025
+- sms: <name or "none"> — mcp: not-verified-as-of-2025
+- mls: <name or "none"> — mcp: not-verified-as-of-2025
+
+## User-stated preferences
+- email: <google-workspace | outlook | none | not-set>
+- calendar: <google-workspace | outlook | none | not-set>
+- docs: <google-workspace | notion | none | not-set>
+- sms: <tool name or "none">
+- crm: <tool name or "none">
+- team-comms: <slack | none | not-set>
+
+## NYOA usage (what NYOA does when each capability is present)
+- email: nyoa-buyer-seller-comms and nyoa-listing-copy offer to push drafts directly to the agent's email client
+- calendar: nyoa-pipeline and nyoa-weekly-review offer to sync deadlines and showings as calendar events
+- docs: nyoa-listing-copy, nyoa-listing-presentation can save canonical copies to cloud storage
+- sms: nyoa-buyer-seller-comms offers to send SMS drafts via the agent's SMS tool
+- crm: nyoa-log and nyoa-buyer-seller-comms offer to log interactions to the CRM contact record
+- web-scrape: nyoa-listing-audit uses Firecrawl or Puppeteer for Zillow/Redfin/Realtor.com scrapes
+- team-comms: future — not yet used by any skill
 
 ## Notes
 - (any agent-specific configuration that other skills should know)
