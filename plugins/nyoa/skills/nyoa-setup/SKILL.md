@@ -1,6 +1,15 @@
 ---
 name: nyoa-setup
-description: Guided onboarding and workspace management for NYOA. Interviews a real estate agent about their business, voice, pipeline, and tools, then populates nyoa-context/ and scaffolds nyoa-workspace/ so every other NYOA skill works immediately. Supports modes for resuming a partial setup, migrating from v0.5.x, or updating a single context area. Use this skill when an agent says "set me up", "onboard me", "help me get started", "first time using this", "build my profile", "build my workspace", or when nyoa-context/ does not yet exist. Triggers on phrases like "setup", "onboarding", "get started", "new agent", "update my voice", "update my profile", "migrate to v0.6", or "resume setup". Also accepts modes: /nyoa-setup resume, /nyoa-setup migrate, /nyoa-setup workspace, /nyoa-setup identity, /nyoa-setup voice, /nyoa-setup proofs, /nyoa-setup competitors, /nyoa-setup book, /nyoa-setup templates, /nyoa-setup connectors.
+description: >
+  Guided onboarding and workspace management for NYOA. Interviews a real estate agent about their
+  business, voice, pipeline, and tools, then populates nyoa-context/ and scaffolds nyoa-workspace/
+  so every other NYOA skill works immediately. Supports modes for resuming a partial setup,
+  migrating from v0.5.x, or updating a single context area. Use this skill when an agent says
+  "set me up", "onboard me", "help me get started", "first time using this", "build my profile",
+  "build my workspace", or when nyoa-context/ does not yet exist. Triggers on phrases like
+  "setup", "onboarding", "get started", "new agent", "update my voice", "update my profile",
+  "migrate to v0.6", or "resume setup". Accepts modes via $ARGUMENTS including resume, migrate,
+  workspace, identity, voice, proofs, competitors, book, templates, and connectors.
 ---
 
 # NYOA Setup
