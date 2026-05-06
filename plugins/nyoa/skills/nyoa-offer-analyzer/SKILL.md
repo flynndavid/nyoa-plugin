@@ -33,6 +33,14 @@ If the offer text is incomplete, ask what's missing. Do **not** invent terms.
 
 ## Workflow
 
+### Capability requirements
+
+Read `nyoa-context/connectors.md`. If user has a stated preference for a capability, use the corresponding connector. If multiple connectors are available and no preference is set, ask which to use. If none are available, fall back to file-only behavior.
+
+- **email** (`google-workspace` or `outlook`): When available, NYOA offers to push the plain-English offer summary to the agent's email client for delivery to the seller. Always confirm before sending — never auto-send. Falls back to delivering the draft inline.
+- **docs** (`google-workspace` or `notion`): When available, NYOA offers to save the offer analysis to a shared Drive folder or Notion page so the seller can review it. Falls back to inline Markdown for the agent to share manually.
+- No other external capabilities required — all term extraction, math, and analysis are local.
+
 ### 1. Extract key terms
 
 Parse the offer text and extract:

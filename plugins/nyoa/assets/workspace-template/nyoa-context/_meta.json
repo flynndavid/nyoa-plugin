@@ -1,0 +1,17 @@
+{
+  "schema_version": "0.6.0",
+  "installed_at": "YYYY-MM-DD",
+  "setup": {
+    "setup_complete": false,
+    "setup_last_round_completed": 0,
+    "setup_completed_at": null
+  },
+  "workspace": {
+    "backend": "local",
+    "root_path": "."
+  },
+  "agent": {
+    "name": null,
+    "brokerage": null
+  }
+}

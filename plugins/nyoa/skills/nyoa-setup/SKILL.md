@@ -1,41 +1,114 @@
 ---
 name: nyoa-setup
-description: Guided onboarding for a real estate agent new to NYOA. Interviews the agent about their business, voice, current pipeline, and tools, then populates nyoa-context/ and scaffolds nyoa-workspace/ so every other NYOA skill works immediately. Use this skill when an agent says "set me up", "onboard me", "help me get started", "first time using this", "build my profile", or runs NYOA for the first time. Triggers on phrases like "setup", "onboarding", "get started", "new agent", "build my workspace", or when nyoa-context/ does not yet exist.
+description: >
+  Guided onboarding and workspace management for NYOA. Interviews a real estate agent about their
+  business, voice, pipeline, and tools, then populates nyoa-context/ and scaffolds nyoa-workspace/
+  so every other NYOA skill works immediately. Supports modes for resuming a partial setup,
+  migrating from v0.5.x, or updating a single context area. Use this skill when an agent says
+  "set me up", "onboard me", "help me get started", "first time using this", "build my profile",
+  "build my workspace", or when nyoa-context/ does not yet exist. Triggers on phrases like
+  "setup", "onboarding", "get started", "new agent", "update my voice", "update my profile",
+  "migrate to v0.6", or "resume setup". Accepts modes via $ARGUMENTS including resume, migrate,
+  workspace, identity, voice, proofs, competitors, book, templates, and connectors.
 ---
 
 # NYOA Setup
 
-Get an agent from zero to a fully-populated NYOA workspace in one session. After this skill runs, every other NYOA skill has the context it needs and the agent has a real operating system on disk.
+Get an agent from zero to a fully-populated NYOA workspace in one session — or pick up exactly where they left off. After this skill runs, every other NYOA skill has the context it needs and the agent has a real operating system on disk. In v0.6, the workspace is anchored by `nyoa-context/_meta.json`, which tracks schema version and setup progress so interrupted sessions can resume and stale workspaces can be upgraded.
 
 ## When this skill triggers
 
 - "Set me up" / "onboard me" / "help me get started"
 - "First time using NYOA" / "build my profile" / "build my workspace"
 - Agent runs any NYOA skill and `nyoa-context/profile.md` does not exist (offer to run setup first)
-- Phrases: "setup", "onboarding", "get started", "new agent"
+- "Resume setup" / "continue where I left off"
+- "Migrate to v0.6" / "upgrade my workspace" / "update to new version"
+- "Update my identity" / "redo my voice" / "add more testimonials" (routes to per-round modes)
+- Phrases: "setup", "onboarding", "get started", "new agent", "update my profile"
 
 ## Inputs you need
 
-Nothing required up front. The skill conducts an interview. Skip any section the agent doesn't want to answer — partial population is fine, the workspace can be filled in over time.
+Nothing required up front. The skill conducts an interview. Skip any round the agent doesn't want to answer — partial population is fine; the workspace fills in over time.
+
+**Optional argument:** `/nyoa-setup <mode>` — see the Mode Dispatch table in the Workflow section.
 
 ## Workflow
 
-### 1. Detect prior state
+### Mode dispatch (`$ARGUMENTS`)
 
-Before asking anything, check what already exists in the working directory:
+When invoked as `/nyoa-setup <mode>`, dispatch immediately to the corresponding sub-workflow. When invoked with no arguments, run the default state-detection path below.
 
-- Does `nyoa-context/` exist? Which files? Read each one.
-- Does `nyoa-workspace/` exist?
+| Mode | Action |
+|------|--------|
+| _(no args)_ | Detect state → full interview or resume prompt |
+| `resume` | Read `_meta.json.setup.setup_last_round_completed` → start from that round + 1 |
+| `migrate` | Run the v0.5.x → v0.6.0 migration sub-workflow (see below) |
+| `workspace` | Run Round 1 only (workspace detection / confirmation) |
+| `identity` | Run Round 2 only (business identity → `profile.md`) |
+| `voice` | Run Round 3 only (voice preferences → `voice.md`) |
+| `proofs` | Run Round 4 only (testimonials / proof → `proofs.md`) |
+| `competitors` | Run Round 5 only (competitor research → `competitors.md`) |
+| `book` | Run Round 6 only (pipeline snapshot) |
+| `templates` | Run Round 7 only (template import → `nyoa-workspace/templates/`) |
+| `connectors` | Round 8 — delegate immediately to `/nyoa-connect` |
+| `tools` | Alias for `connectors` |
 
-If both exist with content, this is a re-run. Confirm with the agent: "Looks like you've been here before. Want me to (a) fill in just the missing pieces, (b) review and update what's there, or (c) start fresh?" Default to (a).
+For any single-round mode: run that round, save the result, increment `setup_last_round_completed` only if the round number is higher than the current value (don't regress), then exit. Do not run the full 8-round flow.
 
-If neither exists, this is a first run — proceed.
+### Capability requirements
 
-### 2. Interview — 7 short rounds
+This skill uses no external capabilities. It writes local files only (no email, calendar, CRM, or MCP connectors required).
 
-Ask one round at a time. Keep questions tight. Confirm answers as you go. Auto-save after each round so an interrupted session isn't lost.
+### 1. Default state detection (no args)
 
-#### Round 1 — Identity (writes `nyoa-context/profile.md`)
+Before asking anything, check what already exists:
+
+1. **`nyoa-context/_meta.json` exists with `schema_version: "0.6.0"`** → This is a v0.6 workspace.
+   - If `setup.setup_complete` is `true`: "Your NYOA workspace is fully set up. Use `/nyoa-setup <mode>` to update any section (e.g., `/nyoa-setup voice`). Or say 'go' to review what's there."
+   - If `setup.setup_complete` is `false`: "You're partway through setup (last completed: Round N). Say 'resume' or run `/nyoa-setup resume` to continue."
+
+2. **`_meta.json` is missing but `nyoa-context/profile.md` exists** → v0.5.x workspace.
+   - "I found an existing v0.5.x workspace. Run `/nyoa-setup migrate` to upgrade it to v0.6.0, or I can do that now — it's non-destructive and takes under a minute. Which would you prefer?"
+
+3. **Neither exists** → First run. Proceed to Round 1 (workspace confirmation).
+
+### 2. Interview — 8 rounds
+
+Ask one round at a time. Keep questions tight. Confirm answers as you go. Auto-save after each round: update `_meta.json` with the incremented `setup_last_round_completed` immediately after the round's files are written, so an interrupted session is never lost.
+
+---
+
+#### Round 1 — Workspace (writes `nyoa-context/_meta.json`)
+
+**Goal:** confirm the workspace location and create `_meta.json` if it doesn't exist.
+
+- Tell the agent: "I'll set up your NYOA workspace in this folder: `[cwd]`. Is that right? (You can say 'change' to pick a different folder, but the local backend always uses your current working directory — the folder you have open when you run NYOA skills.)"
+- If the agent says "change": explain that the workspace path is always the current working directory in v0.6. They need to re-open their terminal / editor in the target folder, then run `/nyoa-setup` again. Exit gracefully.
+- If confirmed (default): write `nyoa-context/_meta.json`:
+  ```json
+  {
+    "schema_version": "0.6.0",
+    "installed_at": "<today YYYY-MM-DD>",
+    "setup": {
+      "setup_complete": false,
+      "setup_last_round_completed": 1,
+      "setup_completed_at": null
+    },
+    "workspace": {
+      "backend": "local",
+      "root_path": "."
+    },
+    "agent": {
+      "name": null,
+      "brokerage": null
+    }
+  }
+  ```
+- Create `nyoa-context/` directory if it doesn't exist. Confirm: "Workspace anchored at `[cwd]/nyoa-context/`."
+
+---
+
+#### Round 2 — Identity (writes `nyoa-context/profile.md`, updates `_meta.json`)
 
 - Full name (as it appears in marketing)
 - Brokerage / team
@@ -46,25 +119,41 @@ Ask one round at a time. Keep questions tight. Confirm answers as you go. Auto-s
 - Ideal client (1–2 sentences)
 - Top 2–3 differentiators (what makes you different from other agents in your market)
 
-#### Round 2 — Voice (writes `nyoa-context/voice.md`)
+After saving `profile.md`, update `_meta.json`: set `agent.name` and `agent.brokerage` from the answers above, and set `setup.setup_last_round_completed: 2`.
+
+---
+
+#### Round 3 — Voice (writes `nyoa-context/voice.md`)
 
 - Pick a tone: warm + conversational / professional + polished / bold + direct / data-driven analyst / luxury concierge / other
 - Paste 2–3 examples of your own writing (a past listing description, a recent email, a social post). NYOA will use these to learn your voice.
 - Words/phrases you love
-- Words/phrases you avoid ("nestled", "boasts", "must-see", etc. are blocked house-wide already)
+- Words/phrases you avoid ("nestled", "boasts", "must-see" are blocked house-wide already)
 
-#### Round 3 — Proof (writes `nyoa-context/proofs.md`)
+After saving `voice.md`, update `_meta.json`: set `setup.setup_last_round_completed: 3`.
+
+---
+
+#### Round 4 — Proof (writes `nyoa-context/proofs.md`)
 
 - Top 3 testimonials (paste them; or paste links and we'll fetch)
 - Awards / designations / certifications
 - Stats you're proud of (e.g., "150 homes sold in East Nashville since 2018")
 
-#### Round 4 — Competitors (writes `nyoa-context/competitors.md`)
+After saving `proofs.md`, update `_meta.json`: set `setup.setup_last_round_completed: 4`.
+
+---
+
+#### Round 5 — Competitors (writes `nyoa-context/competitors.md`)
 
 - Top 3 agents/teams you compete with by name (so AEO head-to-head content can be sharpened later)
 - Optional: their websites
 
-#### Round 5 — Pipeline snapshot (writes `nyoa-workspace/pipeline.md` + scaffolds folders)
+After saving `competitors.md`, update `_meta.json`: set `setup.setup_last_round_completed: 5`.
+
+---
+
+#### Round 6 — Book (pipeline snapshot; writes `nyoa-workspace/pipeline.md` + scaffolds folders)
 
 For each currently-active client or listing, capture:
 
@@ -74,35 +163,75 @@ For each currently-active client or listing, capture:
 - Last activity (rough date is fine)
 - Next step
 
-For every entry, scaffold the matching folder from `plugins/nyoa/assets/workspace-template/clients/_template/` or `listings/_template/` and pre-fill what was just shared. Add a row to `pipeline.md` pointing at the folder.
+For every entry: scaffold the matching folder from `plugins/nyoa/assets/workspace-template/clients/_template/` or `listings/_template/`, pre-fill what was just shared, and add a row to `pipeline.md` pointing at the folder. Pipeline rows follow the format: `[Name](clients/<slug>/) — buyer — last activity YYYY-MM-DD — next: <action> by YYYY-MM-DD`.
 
-#### Round 6 — Templates (optional, writes `nyoa-workspace/templates/`)
+After saving, update `_meta.json`: set `setup.setup_last_round_completed: 6`.
+
+---
+
+#### Round 7 — Templates (optional; writes `nyoa-workspace/templates/`)
 
 - Do you have go-to email templates you reuse? (intro emails, open-house follow-ups). Paste them; we'll save them under `templates/`.
-- Skip if none — the workspace ships with starter templates.
+- Skip if none — the workspace ships with starter templates from `plugins/nyoa/assets/workspace-template/templates/`.
 
-#### Round 7 — Tools (delegates to /nyoa-connect)
+After saving (or skipping), update `_meta.json`: set `setup.setup_last_round_completed: 7`.
 
-- Which of these do you use day-to-day: Gmail, Google Calendar, Google Drive / Dropbox, DocuSign, Twilio (SMS), a CRM (Follow Up Boss / HubSpot / Salesforce / kvCORE / Sierra), an MLS portal?
-- Don't probe deeper here — tell the agent: "Run `/nyoa-connect` next and I'll detect what's wired up and write `nyoa-context/connectors.md`."
+---
+
+#### Round 8 — Connectors (delegates to `/nyoa-connect`)
+
+- Briefly: "Which of these do you use day-to-day: Gmail, Google Calendar, Google Drive / Dropbox, DocuSign, Twilio (SMS), a CRM (Follow Up Boss / HubSpot / Salesforce / kvCORE / Sierra), an MLS portal?"
+- Tell the agent: "Run `/nyoa-connect` next and I'll detect what's wired up and write `nyoa-context/connectors.md` with your connector state."
+- Update `_meta.json`: set `setup.setup_last_round_completed: 8`, `setup.setup_complete: true`, `setup.setup_completed_at: <today YYYY-MM-DD>`.
+
+---
 
 ### 3. Scaffold the workspace
 
-If `nyoa-workspace/` does not exist, create it from `plugins/nyoa/assets/workspace-template/`:
+If `nyoa-workspace/` does not exist (or is missing top-level files), create it from `plugins/nyoa/assets/workspace-template/`:
 
-- Copy every file/folder *except* the `_template/` subfolders under `clients/` and `listings/` (those are templates that get copied per-entry).
+- Copy every file/folder except the `_template/` subfolders under `clients/` and `listings/` (those are per-entry templates, copied when a client or listing is created).
 - Replace `{{client_name}}`, `{{address}}`, etc. placeholders only when scaffolding a specific client or listing folder.
-- Leave the workspace's top-level `pipeline.md`, `calendar.md`, `tasks.md` empty-headed (just the section headings) unless Round 5 produced entries.
+- Leave the top-level `pipeline.md`, `calendar.md`, `tasks.md` with just their section headings, unless Round 6 produced entries.
 
-### 4. Personalized next steps
+### 4. Skill tiers and next steps
 
-Based on what the agent filled in, return a tailored “Next 3 things to try” list. Examples:
+After setup completes (or after resuming to Round 8), show this summary:
 
-- If they have any **active listings** with no copy: “You have N active listings. Run `/nyoa-listing-audit <address>` for the weakest one, then `/nyoa-listing-copy` to rewrite it.”
-- If they have **any closed transactions in the last 90 days** without testimonials: “You closed N deals recently and only have X testimonials. Run `/nyoa-testimonial-engine` to draft review requests.”
-- If they listed **competitors**: “Run `/nyoa-aeo head-to-head` against [Top Competitor] to claim that comparison search query.”
-- If they didn’t answer Round 6 (templates): “Next time you write a buyer follow-up you’re happy with, paste it and I’ll save it to `templates/intro-emails.md`.”
-- Always: “Run `/nyoa-connect` to detect your tools and unlock send-from-Gmail / sync-to-calendar features.”
+```
+Your NYOA workspace is live. Here's what's available:
+
+WORKSPACE OPERATIONAL
+  /nyoa-log              — log a call, showing, or client interaction
+  /nyoa-pipeline         — view or update your pipeline board
+  /nyoa-weekly-review    — generate your weekly business review
+  /nyoa-client-add       — add a new buyer or seller to your book
+  /nyoa-listing-add      — add a new listing to your workspace
+
+CONTENT
+  /nyoa-listing-copy     — write or rewrite listing descriptions
+  /nyoa-listing-audit    — score a live listing against best practices
+  /nyoa-buyer-seller-comms — draft emails, texts, and voicemail scripts
+  /nyoa-social-content   — create social posts from your listings and proof
+  /nyoa-listing-presentation — build a seller presentation deck
+  /nyoa-offer-analyzer   — compare and explain competing offers
+  /nyoa-aeo              — publish articles that rank for your name
+  /nyoa-testimonial-engine — draft review requests and format testimonials
+
+HELP + HYGIENE
+  /nyoa-help             — what can NYOA do? (full skill directory)
+  /nyoa-doctor           — diagnose workspace issues
+  /nyoa-find             — search across your clients, listings, and notes
+  /nyoa-archive          — close out completed clients and listings
+```
+
+Then show 2–3 highest-leverage next steps, personalized to what the agent filled in:
+
+- If they have any **active listings** with no copy: "You have N active listings. Run `/nyoa-listing-audit <address>` for the weakest one, then `/nyoa-listing-copy` to rewrite it."
+- If they have **closed transactions in the last 90 days** without testimonials: "You closed N deals recently and only have X testimonials. Run `/nyoa-testimonial-engine` to draft review requests."
+- If they listed **competitors**: "Run `/nyoa-aeo head-to-head` against [Top Competitor] to claim that comparison search query."
+- If they skipped Round 7 (templates): "Next time you write a buyer follow-up you're happy with, paste it and I'll save it to `templates/intro-emails.md`."
+- Always (if connectors not yet run): "Run `/nyoa-connect` to detect your tools and unlock send-from-Gmail / sync-to-calendar features."
 
 Rank by leverage — highest-impact suggestion first.
 
@@ -114,6 +243,7 @@ Print a short summary:
 Set up:
 - nyoa-context/ — profile, voice, proofs, competitors
 - nyoa-workspace/ — N clients, M listings, pipeline initialized
+- _meta.json — workspace anchored, schema v0.6.0
 
 Next steps:
 1. …
@@ -121,30 +251,102 @@ Next steps:
 3. …
 ```
 
+---
+
+### Migrate sub-workflow (`/nyoa-setup migrate`)
+
+Upgrades a v0.5.x workspace to v0.6.0. Non-destructive: never deletes or overwrites existing context files. Completes in under a minute.
+
+**Step 1 — Backup.** Create `nyoa-workspace/.backups/v0.5-to-v0.6/<YYYY-MM-DD>/` and copy into it:
+- `nyoa-context/` (entire directory)
+- `nyoa-workspace/pipeline.md` (if present)
+
+Confirm: "Backup created at `nyoa-workspace/.backups/v0.5-to-v0.6/<date>/`."
+
+**Step 2 — Write `_meta.json`.** Create `nyoa-context/_meta.json`:
+```json
+{
+  "schema_version": "0.6.0",
+  "installed_at": "<today YYYY-MM-DD>",
+  "setup": {
+    "setup_complete": true,
+    "setup_last_round_completed": 7,
+    "setup_completed_at": "<today YYYY-MM-DD>"
+  },
+  "workspace": {
+    "backend": "local",
+    "root_path": "."
+  },
+  "agent": {
+    "name": null,
+    "brokerage": null
+  }
+}
+```
+Note: `setup_last_round_completed` is set to 7 (all v0.5.x rounds are treated as complete). The agent can run `/nyoa-setup connectors` (Round 8) whenever they're ready.
+
+If `nyoa-context/profile.md` exists and contains the agent's name and brokerage, parse and populate `agent.name` and `agent.brokerage` in `_meta.json`.
+
+**Step 3 — Upgrade `connectors.md`.** Read existing `nyoa-context/connectors.md` (if present). Check whether the v0.6.0 sections "## User-stated preferences" and "## NYOA usage" are already there. If not, append them (preserving all existing content verbatim) using the format from `plugins/nyoa/references/context-formats.md`. If `connectors.md` does not exist, create it from the template.
+
+**Step 4 — Ensure `feedback.md` exists.** If `nyoa-context/feedback.md` does not exist, create it with the minimal template from `plugins/nyoa/references/context-formats.md`.
+
+**Step 5 — Upgrade `pipeline.md`.** Read `nyoa-workspace/pipeline.md` (if present). Check whether these two rolling sections exist:
+- `## Recent logs (last 7d)`
+- `## Stale items needing attention`
+
+If either is absent, append it (with empty content) at the end of the file. Never touch existing pipeline entries.
+
+**Step 6 — Confirm.** Print:
+```
+Migration complete. Your workspace is now on v0.6.0.
+  - Backup: nyoa-workspace/.backups/v0.5-to-v0.6/<date>/
+  - Added: nyoa-context/_meta.json (schema v0.6.0)
+  - Updated: nyoa-context/connectors.md (v0.6 sections appended)
+  - Updated: nyoa-workspace/pipeline.md (rolling sections added)
+
+Try /nyoa-help for the full skill directory, or /nyoa-setup connectors to wire up your tools.
+```
+
+**Rollback.** If anything fails after Step 1, delete `nyoa-context/_meta.json` (if it was written) and any appended sections (revert from backup). The plugin then behaves as v0.5.x. Inform the agent: "Migration failed at Step N. Your workspace is unchanged. Backup is at `nyoa-workspace/.backups/v0.5-to-v0.6/<date>/`."
+
+---
+
 ## Compliance pass
 
-- If the agent pasted writing samples that contain Fair Housing red-flag language ("family-friendly", "walk to church", "safe neighborhood", protected-class implications), flag them in voice.md under a `## Phrases to avoid (auto-flagged)` section. Don’t silently strip them — surface so the agent learns.
-- License #, lockbox codes, or any other sensitive info pasted by the agent: save only to local files (never to logs, never to outputs the agent shares externally). Remind the agent that `nyoa-workspace/` is a local folder.
-- If a competitor is named, never write disparaging language about them — record neutral facts only.
+- If the agent pasted writing samples that contain Fair Housing red-flag language, flag them in `voice.md` under a `## Phrases to avoid (auto-flagged)` section. Do not silently strip them — surface so the agent learns. See the canonical Fair Housing red-flag list in `nyoa-listing-copy/references/voice-presets.md`.
+- License #, lockbox codes, or other sensitive info pasted by the agent: save only to local files (never to logs, never to outputs shared externally). Remind the agent that `nyoa-workspace/` is a local folder.
+- If a competitor is named, record neutral facts only — never disparaging language.
+- No invented facts: use `[VERIFY FACT]` for uncertain claims, `[INSERT PROOF]` for needed-but-missing testimonials.
 
 ## Output format
 
-Markdown summary at the end (per Step 5). During the interview, plain text questions and short confirmations.
+Markdown summary at the end of setup (per Step 5 / Confirm and exit). During the interview, plain text questions and short confirmations. After each round, a one-line save confirmation ("Saved to `nyoa-context/profile.md`. Updating `_meta.json`…").
 
-End with: `Voice used: NYOA house` (the agent’s own voice isn’t calibrated yet on first run).
+End with: `Voice used: NYOA house` (the agent's own voice isn't calibrated yet on first run; for single-round re-runs, use the agent's calibrated voice if `voice.md` already exists).
 
 ## Shared context
 
-This skill is a primary writer for **all** of:
+This skill is a primary writer for:
 
-- `nyoa-context/profile.md`
-- `nyoa-context/voice.md`
-- `nyoa-context/proofs.md`
-- `nyoa-context/competitors.md`
+- `nyoa-context/_meta.json` — created in Round 1, updated after every round, finalized at Round 8
+- `nyoa-context/profile.md` — Round 2
+- `nyoa-context/voice.md` — Round 3
+- `nyoa-context/proofs.md` — Round 4
+- `nyoa-context/competitors.md` — Round 5
+- `nyoa-workspace/pipeline.md` — Round 6 (row entries; also adds rolling sections during migrate)
+- `nyoa-workspace/templates/` — Round 7
 
-And it scaffolds (but doesn’t write content into) `nyoa-workspace/`. It defers `nyoa-context/connectors.md` to `/nyoa-connect`.
+It scaffolds (but does not write content into) `nyoa-workspace/`. It defers `nyoa-context/connectors.md` to `/nyoa-connect`.
+
+Reads during state detection:
+- `nyoa-context/_meta.json` — schema version and setup progress
+- `nyoa-context/profile.md` — to detect v0.5.x installs and pre-populate migrate
 
 ## Reference files
 
 - `plugins/nyoa/references/context-formats.md` — canonical schemas for every file written by this skill
+- `plugins/nyoa/references/workspace-io.md` — workspace I/O contract (path resolution, read/write rules)
 - `plugins/nyoa/assets/workspace-template/` — the workspace skeleton scaffolded in Step 3
+- `plugins/nyoa/migrations/0.6.0/index.md` — what changed in v0.6.0 schema and migration steps
+- `nyoa-listing-copy/references/voice-presets.md` — Fair Housing red-flag list (referenced in compliance pass)

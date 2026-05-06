@@ -8,6 +8,8 @@ The end-user audience is real estate agents — not developers. Skills must be i
 
 As of v0.5.0, NYOA is a real estate **operating system**, not just a content toolbelt. Skills now read and write a persistent local workspace (`nyoa-workspace/`) and shared business identity (`nyoa-context/`). Past sessions compound; future sessions start with full context.
 
+As of v0.6.0, NYOA has workspace abstraction, schema versioning, a help system, hygiene tools, and the `$ARGUMENTS`-dispatch pattern for multi-mode skills. See the [v0.6 conventions section](#v06-workspace-abstraction-schema-versioning-help-system-and-arguments-dispatch) below.
+
 ---
 
 ## Repo structure
@@ -26,14 +28,25 @@ nyoa-plugin/
     │   └── workspace-template/         # Scaffolded by /nyoa-setup et al
     ├── references/
     │   └── context-formats.md          # nyoa-context/ + nyoa-workspace/ format spec
+    ├── migrations/
+    │   └── 0.6.0/index.md              # v0.5.x → v0.6.0 migration guide
+    ├── references/
+    │   ├── context-formats.md          # nyoa-context/ + nyoa-workspace/ format spec
+    │   ├── workspace-io.md             # workspace I/O contract (v0.6)
+    │   ├── onboarding-prompts.md       # in-flow capture patterns
+    │   └── workflows/                  # 6 step-by-step workflow recipes
     └── skills/
-        ├── nyoa-setup/                 (v0.5.0)
+        ├── nyoa-setup/                 (v0.6.0 — refactored, 8 rounds, $ARGUMENTS dispatch)
         ├── nyoa-client-add/            (v0.5.0)
         ├── nyoa-listing-add/           (v0.5.0)
-        ├── nyoa-pipeline/              (v0.5.0)
+        ├── nyoa-pipeline/              (v0.6.0 — rolling sections)
         ├── nyoa-weekly-review/         (v0.5.0)
-        ├── nyoa-log/                   (v0.5.0)
-        ├── nyoa-connect/               (v0.5.0)
+        ├── nyoa-log/                   (v0.6.0 — recent-logs refresh)
+        ├── nyoa-connect/               (v0.6.0 — user-stated preferences)
+        ├── nyoa-help/                  (v0.6.0)
+        ├── nyoa-doctor/                (v0.6.0)
+        ├── nyoa-find/                  (v0.6.0)
+        ├── nyoa-archive/               (v0.6.0)
         ├── nyoa-listing-audit/
         ├── nyoa-listing-copy/
         ├── nyoa-buyer-seller-comms/
@@ -266,6 +279,101 @@ Third-party marketplaces don't auto-update unless the agent toggles it on. The R
 ### Version must match across both manifests
 
 If `marketplace.json` says `0.5.1` but `plugin.json` says `0.5.0`, Cowork sometimes accepts the install but reports the wrong version. Always update both atomically in the same commit.
+
+---
+
+## v0.6: workspace abstraction, schema versioning, help system, and `$ARGUMENTS` dispatch
+
+### `nyoa-context/_meta.json` — the workspace manifest
+
+Every v0.6+ workspace has `nyoa-context/_meta.json`. It is the **sole file that carries `schema_version`** — no other context file is versioned. Skills that need to know the schema version read this file.
+
+```json
+{
+  "schema_version": "0.6.0",
+  "installed_at": "YYYY-MM-DD",
+  "setup": {
+    "setup_complete": false,
+    "setup_last_round_completed": 0,
+    "setup_completed_at": null
+  },
+  "workspace": {
+    "backend": "local",
+    "root_path": "."
+  },
+  "agent": {
+    "name": null,
+    "brokerage": null
+  }
+}
+```
+
+`workspace.backend` is always `"local"` in v0.6. v0.7 will add `"gdrive"` and `"notion"` without changing any skill code. Never add non-local backend support to v0.6 skills.
+
+### `$ARGUMENTS`-dispatch pattern for multi-mode skills
+
+Skills that support multiple modes (setup, help, doctor) use a **single registrable slash command** that dispatches on `$ARGUMENTS` — not separate slash commands. Example:
+
+```
+/nyoa-setup           → full interview (default)
+/nyoa-setup resume    → continue from last completed round
+/nyoa-setup migrate   → v0.5.x → v0.6.0 upgrade
+/nyoa-setup voice     → Round 3 only
+```
+
+The dispatch table lives at the **top of the Workflow section** in SKILL.md. One skill, one `name:` in frontmatter, one directory.
+
+This pattern applies to:
+- `/nyoa-setup` — 11 dispatch modes (resume, migrate, workspace, identity, voice, proofs, competitors, book, templates, connectors, tools)
+- `/nyoa-help` — default list / skill-explain / workflow-recipe
+- `/nyoa-doctor` — full audit / schema / setup / connectors / stale
+
+When adding new dispatch modes to an existing skill, add them to the same SKILL.md — do not create a new skill directory.
+
+### Capability requirements sub-section (mandatory for all skills, v0.6+)
+
+Every SKILL.md must have a `### Capability requirements` sub-section as the **first sub-section inside `## Workflow`** (before the numbered steps). This declares what external capabilities the skill uses:
+
+```markdown
+### Capability requirements
+
+This skill can use:
+- **email** — if an email connector is detected and preferred, offer to push drafts to the agent's email client. Falls back to inline Markdown if unavailable.
+- **calendar** — offer to sync deadlines as calendar events. Falls back to writing to calendar.md only.
+
+Read `nyoa-context/connectors.md` and check `User-stated preferences.<capability>`. If set and available, offer to use it; always confirm before sending or syncing. If none available, fall back to file-only behavior silently.
+```
+
+For skills that use no external capabilities: `"This skill reads/writes local files only. No external capabilities required."`
+
+This section does NOT change the mandated SKILL.md section order (it is a sub-section of Workflow, not a new top-level section).
+
+### Capability branching rule (mandatory)
+
+Skills must never hard-code MCP tool names. They declare **capabilities** (`email`, `calendar`, `docs`, `sms`, `crm`, `meeting-notes`, `web-scrape`, `team-comms`) and follow this rule:
+
+1. Read `nyoa-context/connectors.md`.
+2. If user has a stated preference (`User-stated preferences.<capability>`), use the corresponding connector.
+3. If multiple connectors available and no preference set, ask: "You have both X and Y available — which would you like to use?"
+4. If no connector available, fall back to file-only behavior (write to workspace, ask agent to paste/export).
+
+### In-flow capture (mandatory for content skills)
+
+When a content skill encounters missing context (`voice.md` empty, `profile.md` missing, client not in workspace), it must use the standard re-prompting patterns from `plugins/nyoa/references/onboarding-prompts.md` rather than failing or asking for a full setup run. Key rules:
+
+- Always proceed. Deliver output with stated assumptions; capture data after.
+- Auto-save without asking permission. Confirm file path afterward.
+- Surface the schema mismatch nudge at the end of the response, not before it.
+
+### v0.6 references (new in this release)
+
+| File | Purpose |
+|------|---------|
+| `plugins/nyoa/references/workspace-io.md` | Read/write contract, path resolution, capability branching rule |
+| `plugins/nyoa/references/onboarding-prompts.md` | Standard re-prompting patterns for missing context |
+| `plugins/nyoa/references/workflows/` | 6 step-by-step workflow recipes (new-buyer, new-listing, under-contract, open-house, listing-not-selling, first-month) |
+| `plugins/nyoa/migrations/0.6.0/index.md` | v0.5.x → v0.6.0 migration guide |
+| `plugins/nyoa/assets/workspace-template/nyoa-context/_meta.json` | `_meta.json` template written by `/nyoa-setup` |
 
 ---
 

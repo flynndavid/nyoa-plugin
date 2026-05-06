@@ -46,6 +46,14 @@ Determine voice in this order:
 
 ## Workflow
 
+### Capability requirements
+
+Read `nyoa-context/connectors.md`. If user has a stated preference for a capability, use the corresponding connector. If multiple connectors are available and no preference is set, ask which to use. If none are available, fall back to file-only behavior.
+
+- **email** (`google-workspace` or `outlook`): When available, NYOA offers to push the buyer email blast draft directly to the agent's email client. Always confirm before sending — never auto-send. Falls back to delivering the draft inline.
+- **docs** (`google-workspace` or `notion`): When available, NYOA offers to save the canonical `copy.md` to cloud storage (Drive or Notion) in addition to the local workspace write-through. Falls back to inline Markdown + `nyoa-workspace/listings/<slug>/copy.md`.
+- No other external capabilities required — all copy generation is local.
+
 1. Confirm the inputs. If anything required is missing, ask once and wait.
 2. Resolve voice mode.
 3. Write the **MLS remarks** first (`assets/templates/mls-remarks.md`). The hook from the MLS remarks is the seed for everything else.

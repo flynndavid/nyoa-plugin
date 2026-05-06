@@ -30,6 +30,10 @@ Optional:
 
 ## Workflow
 
+### Capability requirements
+
+This skill writes local files only. No external capabilities required. (If a testimonial-shaped quote is detected in the log, it may defer to `/nyoa-testimonial-engine` which has its own capability requirements.)
+
 ### 1. Identify the subject
 
 Match against existing folders:
@@ -74,6 +78,19 @@ Update the matching entry in `nyoa-workspace/pipeline.md`:
 - Refresh the `last activity YYYY-MM-DD` field.
 - If the log includes a next step, replace the existing `next:` clause.
 - Update the `Last updated:` stamp at the bottom.
+
+### 3a. Refresh pipeline.md "Recent logs" section
+
+After refreshing the pipeline entry (Step 3), also update the `## Recent logs (last 7d)` rolling section at the bottom of `pipeline.md`:
+
+1. Prepend the new log entry to the top of the `## Recent logs (last 7d)` section.
+2. Drop any entries in that section older than 7 days (count from today's date).
+3. Use this format for the new entry:
+   ```
+   YYYY-MM-DD — [Name/Address] — [one-line summary of what happened]
+   ```
+4. If the `## Recent logs (last 7d)` section doesn't exist in `pipeline.md`, create it at the bottom of the file before the `---` footer line and `Last updated:` stamp.
+5. Update the `Last updated:` stamp.
 
 ### 4. Detect stage changes
 

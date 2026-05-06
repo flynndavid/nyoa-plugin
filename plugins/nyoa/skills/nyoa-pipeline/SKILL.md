@@ -20,6 +20,13 @@ Nothing required. The skill reads the workspace. The agent may follow up with ed
 
 ## Workflow
 
+### Capability requirements
+
+This skill can use:
+- **calendar** — if google-workspace calendar is detected and preferred, `/nyoa-pipeline` offers to sync deadline entries as Calendar events. Falls back to writing to `nyoa-workspace/calendar.md` only.
+
+Read `nyoa-context/connectors.md` and check `User-stated preferences.calendar`. If set and available, offer to sync; always ask for confirmation before creating events.
+
 ### 1. Read state
 
 - Read `nyoa-workspace/pipeline.md`. If it doesn't exist, ask the agent to run `/nyoa-setup` (or `/nyoa-client-add` / `/nyoa-listing-add`) first.
@@ -56,7 +63,41 @@ For each stale entry, propose one concrete follow-up:
 - Active listing >30 days → "Run `/nyoa-listing-audit` to diagnose; consider price reduction discussion."
 - Stale under-contract → "Status check with lender + escrow."
 
-### 4. Edits the agent can request
+### 4. Write rolling sections to pipeline.md
+
+When `/nyoa-pipeline` runs and makes any edits, it also refreshes two rolling sections at the bottom of `pipeline.md`. These sections are regenerated fresh each run — source files are never modified.
+
+#### `## Recent logs (last 7d)`
+
+Read recent activity from the underlying folders and render a reverse-chronological summary:
+
+- Read `nyoa-workspace/clients/*/timeline.md` for entries dated within the last 7 days.
+- Read `nyoa-workspace/listings/*/showings.md` and `listings/*/offers.md` for entries dated within the last 7 days.
+- Render as a reverse-chronological list (newest first):
+
+  ```
+  ## Recent logs (last 7d)
+  - YYYY-MM-DD — [Client/Listing] — [one-line summary]
+  - YYYY-MM-DD — [Client/Listing] — [one-line summary]
+  ```
+
+- Entries older than 7 days drop off each refresh — they are not deleted from the source files, just not shown here.
+- If no activity in the last 7 days: "No activity logged in the last 7 days."
+
+#### `## Stale items needing attention`
+
+Regenerated each run using the same stale-detection logic as Step 3:
+
+```
+## Stale items needing attention
+- [Name/Address] — [stage] — last activity [N] days ago — suggested: [action]
+```
+
+If no stale items: "No stale items. Pipeline looks healthy."
+
+Both rolling sections live at the bottom of `pipeline.md`, above the `---` footer line and `Last updated:` stamp.
+
+### 5. Edits the agent can request
 
 Accept these in plain language and rewrite `pipeline.md` accordingly:
 
@@ -67,9 +108,9 @@ Accept these in plain language and rewrite `pipeline.md` accordingly:
 
 Never delete a client or listing folder — stage moves are pipeline-only.
 
-### 5. Calendar + tasks integration
+### 6. Calendar + tasks integration
 
-If an entry's `next:` clause includes a date, also append to `nyoa-workspace/calendar.md` and `tasks.md`. If `nyoa-context/connectors.md` shows google-workspace is wired up, suggest syncing the deadline as a Calendar event — don't auto-sync without confirmation.
+If an entry's `next:` clause includes a date, also append to `nyoa-workspace/calendar.md` and `tasks.md`. If `nyoa-context/connectors.md` shows google-workspace is wired up and `User-stated preferences.calendar` is set, offer to sync the deadline as a Calendar event — don't auto-sync without confirmation.
 
 ## Compliance pass
 
