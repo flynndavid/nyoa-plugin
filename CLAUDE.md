@@ -2,7 +2,12 @@
 
 > Read this before adding, editing, or refactoring skills in this repo.
 
-This is a Claude Code / Cowork plugin marketplace shipping AI skills for real estate agents. It distributes via GitHub: agents add `https://github.com/flynndavid/nyoa-plugin` as a marketplace in Cowork and install the `nyoa` plugin.
+This repo ships a shared NYOA skill library with host-specific wrappers for AI agents. Today that means:
+
+- a Claude Code / Cowork marketplace wrapper
+- a Codex marketplace wrapper
+
+The shared payload still lives under `plugins/nyoa/`. Keep skills, templates, references, and workspace schema host-agnostic whenever possible. Wrapper metadata should stay host-specific.
 
 The end-user audience is real estate agents — not developers. Skills must be invocable by typing a slash command in plain English; output must be copy-paste ready into MLS systems, social media, email, and CRM tools.
 
@@ -16,10 +21,12 @@ As of v0.6.0, NYOA has workspace abstraction, schema versioning, a help system, 
 
 ```
 nyoa-plugin/
-├── .claude-plugin/marketplace.json    # Marketplace metadata (Cowork pulls this first)
+├── .agents/plugins/marketplace.json    # Codex marketplace metadata
+├── .claude-plugin/marketplace.json     # Marketplace metadata (Cowork pulls this first)
 ├── README.md                           # End-user docs (agent-facing, install + usage)
 ├── CLAUDE.md                           # This file — dev guide
 └── plugins/nyoa/
+    ├── .codex-plugin/plugin.json      # Codex plugin manifest
     ├── .claude-plugin/plugin.json     # Plugin manifest
     ├── hooks/                         # SessionStart hook
     │   ├── hooks.json
@@ -203,6 +210,8 @@ The plugin ships one hook today: a SessionStart nudge.
 **Location:** `plugins/nyoa/hooks/hooks.json` + `plugins/nyoa/hooks/session-start.sh`.
 
 **Behavior:** if the working directory has `nyoa-context/` or `nyoa-workspace/` but `nyoa-context/profile.md` is missing, print a one-line message telling the agent to run `/nyoa-setup`. Otherwise stay silent so it doesn't pollute non-NYOA sessions.
+
+**Scope:** this hook is currently Claude-specific. The Codex wrapper does not point at it yet.
 
 **Why a separate `.sh` file:** the hook command lives in a real shell script (not inline in `hooks.json`) to avoid JSON-vs-shell quote-escaping pain. Adding more hooks should follow the same pattern — one script per hook, referenced from `hooks.json`.
 

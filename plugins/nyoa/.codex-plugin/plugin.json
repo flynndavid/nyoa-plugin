@@ -1,0 +1,58 @@
+{
+  "name": "nyoa",
+  "version": "0.8.0",
+  "description": "NYOA — Not Your Ordinary Agent. Real estate operating system skills for Codex.",
+  "author": {
+    "name": "Automatic",
+    "email": "david@automatic.so",
+    "url": "https://davidflynn.co"
+  },
+  "homepage": "https://github.com/flynndavid/nyoa-plugin",
+  "repository": "https://github.com/flynndavid/nyoa-plugin",
+  "license": "MIT",
+  "keywords": [
+    "real-estate",
+    "nyoa",
+    "listings",
+    "agent",
+    "comms",
+    "mls",
+    "aeo",
+    "offers",
+    "social-media",
+    "testimonials",
+    "workspace",
+    "onboarding",
+    "pipeline",
+    "crm",
+    "transactions",
+    "open-house",
+    "market-update",
+    "bookkeeping",
+    "3d-tour",
+    "virtual-tour",
+    "gaussian-splat"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "NYOA",
+    "shortDescription": "Real estate workflow and content skills for Codex",
+    "longDescription": "Bring NYOA into Codex with the same shared skill library used by the Claude marketplace wrapper. This Codex wrapper exposes NYOA's onboarding, pipeline, listing, communications, transaction, growth, and marketing skills without changing the existing Claude configuration.",
+    "developerName": "Automatic",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/flynndavid/nyoa-plugin",
+    "privacyPolicyURL": "https://davidflynn.co",
+    "termsOfServiceURL": "https://github.com/flynndavid/nyoa-plugin",
+    "defaultPrompt": [
+      "Set up NYOA in this real estate workspace",
+      "Draft buyer and seller communications with NYOA",
+      "Build listing copy and a pricing narrative with NYOA"
+    ],
+    "brandColor": "#1F2937",
+    "screenshots": []
+  }
+}

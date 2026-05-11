@@ -132,9 +132,18 @@ NYOA grew from a content toolbelt into a real estate operating system. The big s
 
 ---
 
+## Install
+
+NYOA ships with two wrappers around the same shared skill library:
+
+- **Claude Code / Cowork** via `.claude-plugin/`
+- **OpenAI Codex** via `.codex-plugin/` plus `.agents/plugins/marketplace.json`
+
+The skills, references, templates, and workspace schema are shared. The host-specific wrapper files are separate.
+
 ## Install (Cowork — claude.ai)
 
-This is the path most NYOA agents will use.
+This is the main path for Claude.
 
 ### 1. Add the NYOA marketplace
 
@@ -173,6 +182,38 @@ If you don't see the new skills after a release:
 4. After the update completes, the new slash commands should appear in your conversation autocomplete.
 
 If they still don't appear, remove and re-add the marketplace using the same URL — that forces a full re-sync.
+
+---
+
+## Install (OpenAI Codex)
+
+This repo also includes a Codex wrapper for the same NYOA skills.
+
+### 1. Open the repo in Codex
+
+Open this repository as your workspace in Codex.
+
+### 2. Use the local marketplace definition
+
+The Codex marketplace file for this repo lives at:
+
+`./.agents/plugins/marketplace.json`
+
+That marketplace exposes the local `nyoa` plugin from:
+
+`./plugins/nyoa`
+
+### 3. Enable the `nyoa` plugin
+
+Once enabled, Codex loads the NYOA skill library from:
+
+`plugins/nyoa/skills/`
+
+### Codex notes
+
+- The Codex wrapper shares the same NYOA skills and assets as the Claude wrapper.
+- The existing Claude SessionStart hook remains unchanged and Claude-specific.
+- The Codex wrapper is intentionally additive, so Claude marketplace installs continue to work as before.
 
 ---
 
@@ -341,8 +382,10 @@ If auto-update is off, click **Update** on the NYOA marketplace card whenever yo
 
 ```
 nyoa-plugin/
+├── .agents/plugins/marketplace.json
 ├── .claude-plugin/marketplace.json
 └── plugins/nyoa/
+    ├── .codex-plugin/plugin.json
     ├── .claude-plugin/plugin.json
     ├── hooks/
     │   ├── hooks.json                     # SessionStart hook
@@ -388,7 +431,7 @@ nyoa-plugin/
         └── nyoa-testimonial-engine/
 ```
 
-Each skill has a `SKILL.md` (the instructions Claude follows), and where appropriate an `assets/templates/` folder (output structures) and a `references/` folder (rubrics, voice presets, channel rules, article specs, content type examples).
+Each skill has a `SKILL.md` (the shared instructions NYOA runs through Claude or Codex), and where appropriate an `assets/templates/` folder (output structures) and a `references/` folder (rubrics, voice presets, channel rules, article specs, content type examples).
 
 ---
 
