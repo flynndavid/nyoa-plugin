@@ -214,6 +214,7 @@ Once enabled, Codex loads the NYOA skill library from:
 - The Codex wrapper shares the same NYOA skills and assets as the Claude wrapper.
 - The existing Claude SessionStart hook remains unchanged and Claude-specific.
 - The Codex wrapper is intentionally additive, so Claude marketplace installs continue to work as before.
+- Codex may expose skills with plugin-style namespacing such as `/nyoa:nyoa-setup` rather than Claude's `/nyoa-setup`. The underlying skill library is the same.
 
 ---
 

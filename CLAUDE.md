@@ -233,7 +233,11 @@ The plugin ships one hook today: a SessionStart nudge.
    - Shared context formats → `plugins/nyoa/references/context-formats.md`
    - Workspace templates → `plugins/nyoa/assets/workspace-template/`
 5. **Decide workspace integration.** If the skill produces user-visible content for a listing or client, write through to the relevant workspace folder when present. Always fall back gracefully when the workspace doesn't exist.
-6. **Bump version** in `plugins/nyoa/.claude-plugin/plugin.json` AND `.claude-plugin/marketplace.json` (both must match — schema validators enforce this).
+6. **Bump version** in every host manifest that carries a version:
+   - `plugins/nyoa/.claude-plugin/plugin.json`
+   - `.claude-plugin/marketplace.json`
+   - `plugins/nyoa/.codex-plugin/plugin.json`
+   Keep the shared NYOA version aligned across wrappers so Claude and Codex reflect the same release.
 7. **Update README.md** to list the new skill. The README is the agent-facing doc; if it's not in the README, agents won't discover it.
 8. **Test before commit** — install locally in Cowork, smoke-test the skill with a real scenario.
 9. **Commit + push** — descriptive commit message starting with `vX.Y.Z:`.
@@ -242,7 +246,7 @@ The plugin ships one hook today: a SessionStart nudge.
 
 ## Versioning + release flow
 
-Semantic versioning. Both `marketplace.json` and `plugin.json` must have the same version.
+Semantic versioning. Keep the shared NYOA version aligned across the Claude and Codex plugin manifests.
 
 - **Patch (0.5.0 → 0.5.1):** README updates, doc fixes, prompt tweaks within an existing skill, template wording changes
 - **Minor (0.5.x → 0.6.0):** New skill, breaking template change, new reference file structure, new hook
@@ -286,9 +290,9 @@ Cowork's schema validator requires lowercase. We tried `"name": "NYOA"` once (v0
 
 Third-party marketplaces don't auto-update unless the agent toggles it on. The README walks them through it. Assume most agents won't have it on, so include the manual update path in any troubleshooting docs.
 
-### Version must match across both manifests
+### Version must match across host manifests
 
-If `marketplace.json` says `0.5.1` but `plugin.json` says `0.5.0`, Cowork sometimes accepts the install but reports the wrong version. Always update both atomically in the same commit.
+If the Claude marketplace manifest and Claude plugin manifest drift, Cowork can accept the install but report the wrong version. If the Codex plugin manifest drifts from the same NYOA release, the two hosts can present different installed versions for the same skill library. Update all host manifests atomically in the same commit.
 
 ---
 
