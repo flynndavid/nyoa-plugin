@@ -58,7 +58,7 @@ Read `nyoa-context/connectors.md`. If user has a stated preference for a capabil
 3. Build the **comparable sales summary table** (`assets/templates/comp-table.md`).
 4. Write the **market narrative** (`assets/templates/market-narrative.md`) — 2-3 paragraphs interpreting what the comps tell us about this market and this property's position.
 5. Draft the **pricing strategy** (`assets/templates/pricing-strategy.md`) — recommended list price, price range, DOM expectation, strategic posture.
-6. Generate the **marketing plan** (`assets/templates/marketing-plan.md`) — what the agent will do to market this listing. Reference nyoa-listing-copy as a concrete deliverable.
+6. Generate the **marketing plan** (`assets/templates/marketing-plan.md`) — what the agent will do to market this listing. Reference nyoa-listing-copy as a concrete deliverable. Also reference `/nyoa-3d-tour` as the 3D walkthrough deliverable; if `nyoa-workspace/listings/<slug>/marketing/3d-tour.md` already has a Tour URL, substitute the live URL into the marketing-plan template instead of "[URL when ready]".
 7. Write the **agent value proposition** (`assets/templates/agent-value-prop.md`) — 3-5 bullets on why this agent, backed by proof from `nyoa-context/proofs.md` if available.
 8. Assemble the **full presentation** — structured Markdown with all sections in order.
 9. Run the compliance pass.

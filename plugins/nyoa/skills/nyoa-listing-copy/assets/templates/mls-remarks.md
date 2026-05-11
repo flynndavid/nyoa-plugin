@@ -24,6 +24,7 @@
 - {{differentiators}} — 2–3 named features
 - {{lifestyle_scene}} — One concrete scene
 - {{cta}} — Open house time OR call-to-action
+- {{tour_url}} (optional — append " · Walk it now in 3D: [URL]" only if total stays ≤500 chars; otherwise omit, since the URL belongs in MLS's virtual-tour-link field)
 
 ## Example output
 

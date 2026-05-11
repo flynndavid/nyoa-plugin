@@ -26,6 +26,13 @@ Address. Hook (same hook as MLS remarks). One sentence of context for *this list
 - **Price** · **Beds / baths / sqft**
 - **3–5 features** as a clean list (the same anchors from MLS / IG)
 
+#### 3D tour block (conditional)
+If `marketing/3d-tour.md` exists with a Tour URL, insert before the property block:
+
+> 🏠 **Walk this house in 3D** — photoreal browser tour, no app, no signup: [URL]
+
+Skip this block silently if no tour URL exists.
+
 #### Action block
 - Open house time(s)
 - "Reply to this email to set up a private showing this week" (or scheduling link if the agent has one)

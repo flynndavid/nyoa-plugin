@@ -1,6 +1,6 @@
 # NYOA — Not Your Ordinary Agent
 
-A preconfigured Claude for real estate agents — a real operating system for your day-to-day, not just a content tool. Install once, get **26 skills + a local workspace + an onboarding flow** that handles the work agents do every day.
+A preconfigured Claude for real estate agents — a real operating system for your day-to-day, not just a content tool. Install once, get **27 skills + a local workspace + an onboarding flow** that handles the work agents do every day.
 
 ### Onboarding, daily workflow & workspace hygiene
 - **`/nyoa-setup`** — Guided onboarding. 8-round interview that populates your `nyoa-context/` (profile, voice, proofs, competitors) and scaffolds your `nyoa-workspace/`. Supports `$ARGUMENTS` modes: `/nyoa-setup resume`, `/nyoa-setup migrate`, `/nyoa-setup voice`, `/nyoa-setup identity`, and more. Run this first.
@@ -20,6 +20,7 @@ A preconfigured Claude for real estate agents — a real operating system for yo
 - **`/nyoa-listing-audit`** — Score any listing and (optionally) generate a polished HTML demo page with the photos saved locally. Works with a Zillow / Redfin / Realtor.com / MLS URL or pasted MLS remarks. *In v0.7.0:* a new site-audit mode runs traditional SEO + AEO rubrics against an agent's website URL (vs. a listing URL).
 - **`/nyoa-listing-copy`** — Turn a property fact sheet into a full launch package: MLS remarks, long description, X / Instagram posts, and a buyer email blast. Tunable to your voice. Writes through to `nyoa-workspace/listings/<slug>/copy.md` so the canonical copy is always current. *In v0.7.0:* adds a 7-slide carousel script and a pre-listing photoshoot brief.
 - **`/nyoa-open-house`** *(new in v0.7.0)* — Full open-house promo package in one shot: Instagram post, Facebook event, sphere email, text blast, 3-frame Stories sequence, sign-in card copy, and a day-of run-of-show. Reads the listing's facts from the workspace, files the package under `listings/<slug>/marketing/`, adds the open to your calendar.
+- **`/nyoa-3d-tour`** *(new in v0.8.0)* — Stand up a photoreal 3D walkthrough (3D Gaussian Splat) for a listing. `$ARGUMENTS` dispatch: `/nyoa-3d-tour vendor` (one-page brief to send a freelance scanner — $300–$800 typical), `/nyoa-3d-tour capture` (DIY phone-scan checklist with Polycam / Luma / Scaniverse), `/nyoa-3d-tour host` (PlayCanvas Supersplat / Polycam / self-host decision tree), `/nyoa-3d-tour embed` (MLS field + iframe + email link block + yard-sign QR caption), `/nyoa-3d-tour promote` (X / IG / FB / buyer email / open-house add-on for tour launch day). Files the canonical record at `listings/<slug>/marketing/3d-tour.md` so `/nyoa-listing-copy`, `/nyoa-listing-presentation`, `/nyoa-buyer-seller-comms`, and `/nyoa-open-house` auto-include the URL when present.
 
 ### Transaction operations
 - **`/nyoa-contract-deadlines`** *(new in v0.7.0)* — Upload an executed contract; get a structured deadline schedule (earnest money, inspection windows, appraisal, financing, title objection, closing) with owner + consequence-if-missed + reminder offsets. Writes to `listings/<slug>/deadlines.md`, appends to `calendar.md` and `tasks.md`. Branches on Google Calendar if you have it wired up.
@@ -43,6 +44,33 @@ A preconfigured Claude for real estate agents — a real operating system for yo
 - **`/nyoa-bookkeeping`** *(new in v0.7.0)* — Three subcommands, one skill: `receipts` categorizes line items into standard real-estate categories and drafts a bookkeeper email; `settlement` extracts gross commission, brokerage split, net commission, and concessions from an ALTA/HUD statement; `mileage` builds a calendar-derived mileage log. All write to `nyoa-workspace/finance/<YYYY-MM>/` with a per-output verification footer.
 
 All skills enforce **Fair Housing compliance** automatically (no protected-class language, no unsourced structural claims, "primary bedroom" not "master") and strip the usual real-estate clichés ("stunning", "must see", "nestled", "boasts").
+
+---
+
+## What's new in v0.8.0
+
+One new skill, focused on the 3D-tour adoption gap.
+
+**`/nyoa-3d-tour`** — turns "we should add a 3D tour" into a 30-minute decision instead of a week of research. Five modes via `$ARGUMENTS` dispatch:
+
+- `/nyoa-3d-tour vendor` — generates a one-page brief the agent emails to a freelance scanner. Property facts, deliverable spec, $300–$800 pricing band by sqft tier.
+- `/nyoa-3d-tour capture` — DIY phone-scan checklist: staging, lighting, room-by-room route, app picks (Polycam / Luma / Scaniverse).
+- `/nyoa-3d-tour host` — hosting decision tree across PlayCanvas Supersplat, Polycam, Luma, Matterport, and self-host on Vercel / Cloudflare Pages.
+- `/nyoa-3d-tour embed` — MLS virtual-tour-field URL, agent-website iframe, email link block, yard-sign QR caption, OpenGraph metadata for social previews.
+- `/nyoa-3d-tour promote` — launch-day promotion package: X post, Instagram caption, Facebook post, buyer email blast, open-house add-on insert.
+
+**Workspace integration.** Each mode writes to `listings/<slug>/marketing/3d-tour.md` — the canonical record for the tour (URL, capture date, hosting platform, embed snippets, refresh history). Other listing skills read this file and auto-include the URL:
+
+- `/nyoa-listing-copy` — MLS remarks, long description, social variants, and email blast all pick up the tour URL when present.
+- `/nyoa-listing-presentation` — marketing-plan template now lists the 3D walkthrough as a concrete deliverable with cost / value framing for sellers.
+- `/nyoa-buyer-seller-comms` — new `3d-tour-drop` template re-engages buyers when a tour goes live for a listing they touched. Buyer-drip-newlistings template auto-includes "Walk it in 3D first" when a tour exists.
+- `/nyoa-open-house` — open-house promo automatically includes the "can't make Sunday? walk it now" insert on the Facebook event, sphere email, and Stories.
+
+**Why this is a thing.** 3D Gaussian Splatting (the tech) makes photoreal browser-based tours possible from a phone scan, for $200–$800 per house instead of the $1,500+ a Matterport scan used to cost. Agents who add it as a default marketing line item in 2026 look measurably ahead. NYOA doesn't ship the scanner or the host (no MCP exists for any of them) — it scaffolds the workflow around the agent-provided URL.
+
+### Upgrading from v0.7.x
+
+No schema migration required. The new `marketing/3d-tour.md` template stub is created on demand the first time `/nyoa-3d-tour` runs against a listing. Existing listings without a tour file render every other skill's output exactly as before — the integration is silent when absent.
 
 ---
 
@@ -349,6 +377,7 @@ nyoa-plugin/
         ├── nyoa-database-audit/           ← new in v0.7.0
         ├── nyoa-neighborhood-page/        ← new in v0.7.0
         ├── nyoa-bookkeeping/              ← new in v0.7.0
+        ├── nyoa-3d-tour/                  ← new in v0.8.0
         ├── nyoa-listing-audit/
         ├── nyoa-listing-copy/
         ├── nyoa-buyer-seller-comms/

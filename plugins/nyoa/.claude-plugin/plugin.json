@@ -1,11 +1,11 @@
 {
   "name": "nyoa",
-  "version": "0.7.0",
-  "description": "NYOA — a real estate operating system for Claude. 26 AI skills built on the v0.6 architecture (workspace schema versioning, help system, hygiene tools). v0.7 adds the operations layer (contract deadlines, open-house promotion, monthly market updates), growth layer (touch cadence, database audit, neighborhood pages), bookkeeping (receipts, settlement, mileage), and template extensions to listing-audit (SEO/AEO site audit mode), listing-copy (carousel script + photoshoot brief), social-content (weekly planner + IG playbook), and buyer/seller comms (past-client birthday, home anniversary, closing-day note).",
+  "version": "0.8.0",
+  "description": "NYOA — a real estate operating system for Claude. 27 AI skills built on the v0.6 architecture (workspace schema versioning, help system, hygiene tools). v0.8 adds /nyoa-3d-tour — vendor brief, DIY phone-scan checklist, hosting decision tree, embed snippets, and launch-day promotion package for photoreal 3D Gaussian Splat tours; light write-throughs in listing-copy, listing-presentation, buyer-seller-comms, and open-house pick up the tour URL automatically when present. v0.7 added the operations layer (contract deadlines, open-house promotion, monthly market updates), growth layer (touch cadence, database audit, neighborhood pages), bookkeeping (receipts, settlement, mileage), and template extensions to listing-audit (SEO/AEO site audit mode), listing-copy (carousel script + photoshoot brief), social-content (weekly planner + IG playbook), and buyer/seller comms (past-client birthday, home anniversary, closing-day note).",
   "author": {
     "name": "Automatic",
     "email": "david@automatic.so",
     "url": "https://davidflynn.co"
   },
-  "keywords": ["real-estate", "nyoa", "listings", "mls", "agent", "comms", "aeo", "offers", "social-media", "testimonials", "workspace", "onboarding", "pipeline", "crm", "transactions", "open-house", "market-update", "bookkeeping"]
+  "keywords": ["real-estate", "nyoa", "listings", "mls", "agent", "comms", "aeo", "offers", "social-media", "testimonials", "workspace", "onboarding", "pipeline", "crm", "transactions", "open-house", "market-update", "bookkeeping", "3d-tour", "virtual-tour", "gaussian-splat"]
 }

@@ -20,6 +20,7 @@ Generate the messages an agent sends every week. SMS, email, or voicemail script
 - "Birthday note for [past client]"
 - "Anniversary email for [client] — they're at year [N]"
 - "Closing day note for [client]"
+- "Send the 3D tour drop for [address] to my buyer list" / "Notify [client] that 123 Maple now has a 3D tour"
 
 ## Workflow
 
@@ -39,6 +40,7 @@ Buyer-side:
 - `assets/templates/buyer-drip-newlistings.md` — new listings hitting their criteria
 - `assets/templates/buyer-drip-pricedrop.md` — price drop on something they viewed
 - `assets/templates/buyer-checkin.md` — "still looking?" check-in for the cooling lead
+- `assets/templates/3d-tour-drop.md` — re-engagement message when a 3D walkthrough goes live for a listing the buyer has touched. Reads `listings/<slug>/marketing/3d-tour.md` for the URL.
 
 Seller-side:
 - `assets/templates/seller-weekly-update.md` — Friday recap (showings, online activity, comp moves)

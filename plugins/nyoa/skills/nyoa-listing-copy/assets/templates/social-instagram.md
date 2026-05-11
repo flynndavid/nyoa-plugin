@@ -33,6 +33,7 @@ Walk through the house in order: arrival, kitchen / main living, primary suite, 
 - {{stats}} (beds / baths / sqft / price)
 - {{cta}}
 - {{hashtags}} (≤5)
+- {{tour_url}} (optional — appended to the action block as "Walk it in 3D → [URL]" when `marketing/3d-tour.md` has a Tour URL; skip silently if absent)
 
 ## Example
 
