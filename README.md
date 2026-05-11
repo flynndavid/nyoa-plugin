@@ -1,6 +1,6 @@
 # NYOA — Not Your Ordinary Agent
 
-A preconfigured Claude for real estate agents — a real operating system for your day-to-day, not just a content tool. Install once, get **19 skills + a local workspace + an onboarding flow** that handles the work agents do every day.
+A preconfigured Claude for real estate agents — a real operating system for your day-to-day, not just a content tool. Install once, get **26 skills + a local workspace + an onboarding flow** that handles the work agents do every day.
 
 ### Onboarding, daily workflow & workspace hygiene
 - **`/nyoa-setup`** — Guided onboarding. 8-round interview that populates your `nyoa-context/` (profile, voice, proofs, competitors) and scaffolds your `nyoa-workspace/`. Supports `$ARGUMENTS` modes: `/nyoa-setup resume`, `/nyoa-setup migrate`, `/nyoa-setup voice`, `/nyoa-setup identity`, and more. Run this first.
@@ -17,25 +17,74 @@ A preconfigured Claude for real estate agents — a real operating system for yo
 
 ### Listing workflow
 - **`/nyoa-listing-presentation`** — Win the listing appointment. Generate a complete seller pitch: market narrative from your comps, comp summary table, pricing strategy with rationale, marketing plan, and "Why Me" section. Reads `nyoa-workspace/` for property facts + filed comps.
-- **`/nyoa-listing-audit`** — Score any listing and (optionally) generate a polished HTML demo page with the photos saved locally. Works with a Zillow / Redfin / Realtor.com / MLS URL or pasted MLS remarks.
-- **`/nyoa-listing-copy`** — Turn a property fact sheet into a full launch package: MLS remarks, long description, X / Instagram posts, and a buyer email blast. Tunable to your voice. Writes through to `nyoa-workspace/listings/<slug>/copy.md` so the canonical copy is always current.
+- **`/nyoa-listing-audit`** — Score any listing and (optionally) generate a polished HTML demo page with the photos saved locally. Works with a Zillow / Redfin / Realtor.com / MLS URL or pasted MLS remarks. *In v0.7.0:* a new site-audit mode runs traditional SEO + AEO rubrics against an agent's website URL (vs. a listing URL).
+- **`/nyoa-listing-copy`** — Turn a property fact sheet into a full launch package: MLS remarks, long description, X / Instagram posts, and a buyer email blast. Tunable to your voice. Writes through to `nyoa-workspace/listings/<slug>/copy.md` so the canonical copy is always current. *In v0.7.0:* adds a 7-slide carousel script and a pre-listing photoshoot brief.
+- **`/nyoa-open-house`** *(new in v0.7.0)* — Full open-house promo package in one shot: Instagram post, Facebook event, sphere email, text blast, 3-frame Stories sequence, sign-in card copy, and a day-of run-of-show. Reads the listing's facts from the workspace, files the package under `listings/<slug>/marketing/`, adds the open to your calendar.
+
+### Transaction operations
+- **`/nyoa-contract-deadlines`** *(new in v0.7.0)* — Upload an executed contract; get a structured deadline schedule (earnest money, inspection windows, appraisal, financing, title objection, closing) with owner + consequence-if-missed + reminder offsets. Writes to `listings/<slug>/deadlines.md`, appends to `calendar.md` and `tasks.md`. Branches on Google Calendar if you have it wired up.
 
 ### Client communications
-- **`/nyoa-buyer-seller-comms`** — Draft the recurring messages you send every week: buyer drips, seller updates, offer summaries, follow-ups, referral asks. SMS / email / voicemail variants. Logs interactions to client timelines automatically.
+- **`/nyoa-buyer-seller-comms`** — Draft the recurring messages you send every week: buyer drips, seller updates, offer summaries, follow-ups, referral asks. SMS / email / voicemail variants. Logs interactions to client timelines automatically. *In v0.7.0:* now includes past-client relationship templates — birthday note (no CTA), home anniversary (with soft valuation offer for years 1-3, market narrative for year 5+), closing-day handwritten-style card, and a 12-month touch cadence from `/nyoa-touch-cadence`.
 - **`/nyoa-offer-analyzer`** — Paste a contract → get a plain-English seller briefing. Auto-extracts price, financing, earnest, contingencies, etc. Compares multiple offers side-by-side. Drafts counter-offer talking points.
+
+### Database & growth
+- **`/nyoa-touch-cadence`** *(new in v0.7.0)* — Generate a 12-month past-client touch cadence — mix of handwritten notes, drop-by gifts, market-update emails, anniversary reminders, soft referral asks — then write each month's touch as a scheduled task in `tasks.md` and the client's timeline, so the cadence becomes real workspace state instead of a stranded markdown table.
+- **`/nyoa-database-audit`** *(new in v0.7.0)* — Annual deep audit. Reads `pipeline.md` and `clients/`, segments into A/B/C/D (past clients/referrers, warm sphere, cold 12mo+, archive candidates), writes the segmentation report to `reviews/`, and adds segment tags to each client profile so `/nyoa-pipeline` can surface segments.
+- **`/nyoa-neighborhood-page`** *(new in v0.7.0)* — Generate a Fair-Housing-compliant neighborhood landing page (title, meta, H1, intro, 4-5 feature blocks, 3 FAQs with schema, CTA). Pairs with `/nyoa-aeo` for AEO discoverability. Writes to `nyoa-workspace/web/neighborhoods/<slug>.md`.
 
 ### Brand & lead gen
 - **`/nyoa-aeo`** — Get recommended by ChatGPT, Perplexity, and Gemini. Generate AI-optimized articles using the four-type framework: Best Choice, Reasons to Choose, Local Service, Head-to-Head.
-- **`/nyoa-social-content`** — A week of social content that isn't tied to a specific listing. Market commentary, neighborhood spotlights, buyer / seller tips, behind-the-scenes, engagement posts, testimonial features. Per-platform formatting (Instagram / X / Facebook / LinkedIn).
+- **`/nyoa-social-content`** — A week of social content that isn't tied to a specific listing. Market commentary, neighborhood spotlights, buyer / seller tips, behind-the-scenes, engagement posts, testimonial features. Per-platform formatting (Instagram / X / Facebook / LinkedIn). *In v0.7.0:* extended with a Monday planner mode, welcome-DM generator, info-comment-reply pattern, engagement-reset diagnostic, hashtag audit, and just-sold multi-output.
+- **`/nyoa-market-update`** *(new in v0.7.0)* — Your monthly market commentary in three matched formats from one set of MLS numbers: 400-500 word blog post, Instagram caption, and email newsletter. Writes the package to `market-updates/YYYY-MM.md` so next month's piece can reference this month's thesis.
 - **`/nyoa-testimonial-engine`** — Collect, catalog, and repurpose testimonials. Turn a Google review into an AEO proof element, a social post, a listing-presentation pull-quote. Generate review-request emails and SMS for post-close outreach.
+
+### Bookkeeping
+- **`/nyoa-bookkeeping`** *(new in v0.7.0)* — Three subcommands, one skill: `receipts` categorizes line items into standard real-estate categories and drafts a bookkeeper email; `settlement` extracts gross commission, brokerage split, net commission, and concessions from an ALTA/HUD statement; `mileage` builds a calendar-derived mileage log. All write to `nyoa-workspace/finance/<YYYY-MM>/` with a per-output verification footer.
 
 All skills enforce **Fair Housing compliance** automatically (no protected-class language, no unsourced structural claims, "primary bedroom" not "master") and strip the usual real-estate clichés ("stunning", "must see", "nestled", "boasts").
 
 ---
 
+## What's new in v0.7.0
+
+The skill surface roughly doubled. Seven new skills plus extensions to four existing ones — covering operations, growth, and bookkeeping. Built on the v0.6 architecture (schema versioning, help system, hygiene tools), every new skill reads and writes the versioned workspace.
+
+**Operations layer**
+- **`/nyoa-contract-deadlines`** — extract every dated obligation from an executed contract, file the schedule under `listings/<slug>/deadlines.md`, populate `calendar.md` and `tasks.md`. Optional Google Calendar push if the connector is wired up.
+- **`/nyoa-open-house`** — full multi-channel promo package + day-of run-of-show, filed under `listings/<slug>/marketing/open-house-YYYY-MM-DD.md` so the package is reusable for the next OH or relist.
+- **`/nyoa-market-update`** — monthly market piece in three matched formats (blog, IG, email) from one set of stats. Filed in `market-updates/YYYY-MM.md` so narrative compounds month over month.
+
+**Database & growth layer**
+- **`/nyoa-touch-cadence`** — 12-month past-client cadence builder. Schedules each month's touch as a real task in `tasks.md` and the client's timeline.
+- **`/nyoa-database-audit`** — annual A/B/C/D segmentation of the full contact list. Writes a report to `reviews/` and adds segment tags to client profiles.
+- **`/nyoa-neighborhood-page`** — Fair-Housing-compliant neighborhood landing page (title, meta, H1, feature blocks, FAQs with schema). Writes to `nyoa-workspace/web/neighborhoods/<slug>.md`.
+
+**Bookkeeping**
+- **`/nyoa-bookkeeping`** — receipts + settlement + mileage in one skill. Writes to `nyoa-workspace/finance/<YYYY-MM>/`. Pulls inputs from `calendar.md` and closed listing folders so the agent isn't re-pasting data the workspace already has.
+
+**Extensions to existing skills**
+- **`/nyoa-buyer-seller-comms`** — past-client birthday note (no CTA), home anniversary (with soft valuation offer for years 1-3, market narrative for year 5+), and closing-day handwritten-style card.
+- **`/nyoa-social-content`** — Monday planner mode (full week of feed + reel + stories), welcome-DM generator, info-comment-reply pattern, engagement-reset diagnostic, hashtag audit, just-sold multi-output.
+- **`/nyoa-listing-audit`** — site-audit mode for traditional SEO + AEO when given an agent's website URL.
+- **`/nyoa-listing-copy`** — 7-slide carousel script and pre-listing photoshoot brief.
+
+**New workspace folders** (scaffolded by `/nyoa-setup` and created on first use by any skill that needs them):
+- `nyoa-workspace/market-updates/` — one file per month.
+- `nyoa-workspace/listings/<slug>/marketing/` — open-house packages and future event marketing.
+- `nyoa-workspace/listings/<slug>/deadlines.md` — contract deadline schedule.
+- `nyoa-workspace/web/neighborhoods/` — neighborhood landing pages.
+- `nyoa-workspace/finance/<YYYY-MM>/` — bookkeeping artifacts (receipts, settlements, mileage logs).
+
+### Upgrading from v0.6.x
+
+No schema migration required. New folders are created on demand when the new skills run.
+
+---
+
 ## What's new in v0.6.0
 
-v0.6 lays the architectural foundation for everything that comes next — workspace abstraction, schema versioning, a help system, and hygiene tools so the workspace stays useful over time.
+v0.6 laid the architectural foundation — workspace abstraction, schema versioning, a help system, and hygiene tools so the workspace stays useful over time.
 
 - **Workspace schema versioning** — `nyoa-context/_meta.json` tracks `schema_version`, `workspace.backend`, and setup state. Future backends (Google Drive, Notion) can be added in v0.7 without changing any skill code.
 - **Setup refactor** — `/nyoa-setup` now has 8 rounds (new Round 1 confirms the workspace location) and supports `$ARGUMENTS` dispatch: `/nyoa-setup resume` picks up where you left off; `/nyoa-setup migrate` upgrades a v0.5.x workspace non-destructively; `/nyoa-setup voice`, `/nyoa-setup identity`, and other per-round modes let you update any piece without re-running the full interview.
@@ -197,6 +246,8 @@ nyoa-context/                # Business identity — stable, slow-changing
 nyoa-workspace/              # Daily operating data — active, fast-changing
 ├── clients/<slug>/          # profile, timeline, preferences, documents
 ├── listings/<slug>/         # property, copy, comps, showings, offers, photos
+│                            # + deadlines.md and marketing/ (v0.6.0)
+├── market-updates/          # monthly market pieces — YYYY-MM.md (v0.6.0)
 ├── pipeline.md
 ├── calendar.md
 ├── tasks.md
@@ -291,6 +342,13 @@ nyoa-plugin/
         ├── nyoa-doctor/                   ← new in v0.6.0
         ├── nyoa-find/                     ← new in v0.6.0
         ├── nyoa-archive/                  ← new in v0.6.0
+        ├── nyoa-contract-deadlines/       ← new in v0.7.0
+        ├── nyoa-open-house/               ← new in v0.7.0
+        ├── nyoa-market-update/            ← new in v0.7.0
+        ├── nyoa-touch-cadence/            ← new in v0.7.0
+        ├── nyoa-database-audit/           ← new in v0.7.0
+        ├── nyoa-neighborhood-page/        ← new in v0.7.0
+        ├── nyoa-bookkeeping/              ← new in v0.7.0
         ├── nyoa-listing-audit/
         ├── nyoa-listing-copy/
         ├── nyoa-buyer-seller-comms/

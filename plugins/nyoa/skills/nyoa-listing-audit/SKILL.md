@@ -1,6 +1,6 @@
 ---
 name: nyoa-listing-audit
-description: Analyze any real estate listing and produce a strategic audit report, a redesigned listing page (Markdown), and/or a polished HTML demo page with the original photos saved locally. Use this skill whenever the user shares a property listing — by URL (Zillow, Realtor.com, Redfin, Compass, MLS), address, or pasted content — and wants to evaluate, fix, rebuild, or generate a visual mock-up of it. Triggers on phrases like "audit this listing", "what's wrong with this listing", "rewrite this listing", "redo this listing page", "generate a demo listing page", "show me what it could look like", or when the user simply pastes a listing URL.
+description: Two modes in one skill. **Listing mode (default):** analyze any real estate listing and produce a strategic audit report, a redesigned listing page (Markdown), and/or a polished HTML demo page with the original photos saved locally. Use this whenever the user shares a property listing — by URL (Zillow, Realtor.com, Redfin, Compass, MLS), address, or pasted content. **Site audit mode (new in v0.7.0):** when the URL is the agent's own marketing website (not a listing), run a paired SEO + AEO audit and produce a prioritized fix list. Triggers on "audit this listing", "what's wrong with this listing", "rewrite this listing", "redo this listing page", "generate a demo listing page", "show me what it could look like", or — for site mode — "audit my site", "SEO audit", "AEO audit", "audit my website", or the agent passing their own site's homepage URL.
 ---
 
 # Listing Audit
@@ -9,10 +9,17 @@ Read the listing the user shared, score it across a fixed rubric, and return a s
 
 ## When this skill triggers
 
+**Listing mode:**
 - User pastes a Zillow / Realtor.com / Redfin / Compass / MLS URL
 - User pastes raw listing copy (description, MLS remarks, photo list)
 - User gives an address and asks for a review
 - Phrases: "audit", "review", "what's wrong with", "fix", "rewrite", "redo", "redesign", "score this listing"
+
+**Site audit mode (new in v0.7.0):**
+- User passes the URL of their own marketing website (homepage or any internal page) — not a listing URL
+- Phrases: "audit my site", "audit my website", "SEO audit", "AEO audit", "AI-search audit", "is my site getting recommended", "site SEO + AEO", "audit my homepage"
+
+The skill auto-detects: if the URL hostname matches a known portal (zillow.com, redfin.com, realtor.com, compass.com, etc.) → listing mode. If the URL is anywhere else AND no listing keywords are present in the prompt → ask the agent: "Is this a listing audit or a site audit?" Don't guess.
 
 ## What to produce
 
@@ -126,6 +133,28 @@ Only if the user asked for a demo / mock-up / visual rebuild AND photos are avai
 
 See `references/examples.md` for two short worked examples (one with severe issues, one already strong).
 
+## Site audit mode (v0.7.0)
+
+When the URL is the agent's own marketing website (not a listing), the skill runs a different rubric — `references/site-audit-rubric.md` — that pairs traditional SEO with AEO (AI-search optimization).
+
+The output is a prioritized fix list with each issue tagged P0 / P1 / P2:
+
+- **Meta titles and descriptions** — length, keyword inclusion, uniqueness across pages.
+- **H1 / H2 / H3 hierarchy** — one H1 per page, logical structure, conversational H2s (AEO-shaped).
+- **Schema.org markup** — `RealEstateAgent`, `LocalBusiness`, `FAQPage`, `BreadcrumbList`, `RealEstateListing` if applicable.
+- **`llms.txt`** — present at root, structured per the emerging convention. Generated starter if missing.
+- **Citation-worthy paragraphs** — every major claim has a data point or date.
+- **Internal linking** — key pages cross-linked, no orphan pages.
+- **Mobile readability** — font size, button size, viewport meta.
+- **Image optimization** — lazy-loading, alt text, file sizes.
+- **Page-lead structure** — does each page lead with the answer, then the explanation? (AEO crawlers reward this.)
+- **Trust signals** — license number, brokerage name, geographic specificity, real contact info visible.
+- **Footer NAP consistency** — Name / Address / Phone matches Google Business Profile and brokerage records.
+
+The site-audit output ends with a **5-step implementation roadmap** ordered for impact-per-hour-of-work. Most agents won't fix 30 things; they'll fix the top 5.
+
+For the AEO portion specifically, see `references/site-audit-rubric.md` for the specific checks (conversational H2s, FAQ schema, direct-answer paragraphs, llms.txt structure).
+
 ## Output format
 
-Always Markdown. Always headed with the property address and price. Always end with a "What I'd do first" 3-bullet summary so the agent can act in <2 minutes.
+Always Markdown. Always headed with the property address and price (listing mode) or the site URL and primary market (site-audit mode). Always end with a "What I'd do first" 3-bullet summary so the agent can act in <2 minutes.

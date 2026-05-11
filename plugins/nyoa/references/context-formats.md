@@ -27,12 +27,16 @@ The directory starts empty and builds organically. `/nyoa-setup` is the fastest 
 ```
 nyoa-workspace/
 ├── clients/<slug>/         # profile.md, timeline.md, preferences.md, documents.md
-├── listings/<slug>/        # property.md, copy.md, comps.md, showings.md, offers.md, photos.md
+├── listings/<slug>/        # property.md, copy.md, comps.md, showings.md, offers.md,
+│                           # photos.md, deadlines.md (v0.7), marketing/ (v0.7)
+├── market-updates/         # YYYY-MM.md per month (v0.7 — blog + IG + email package)
+├── web/neighborhoods/      # <slug>.md per neighborhood (v0.7 — landing pages)
+├── finance/<YYYY-MM>/      # receipts.md, settlement-<slug>.md, mileage.md (v0.7)
 ├── pipeline.md             # leads / active / under-contract / closed kanban
 ├── calendar.md             # showings, follow-ups, deadlines
 ├── tasks.md                # open todos
 ├── templates/              # agent's saved snippets
-└── reviews/                # weekly review write-ups (YYYY-MM-DD.md)
+└── reviews/                # weekly review write-ups + audit reports (YYYY-MM-DD.md)
 ```
 
 The canonical template tree lives at `plugins/nyoa/assets/workspace-template/`. `/nyoa-setup` and the workspace skills scaffold from it on first use.
@@ -99,13 +103,18 @@ Skills must write `_meta.json` as valid JSON. Never write markdown to this file.
 
 | Location | Read by | Written by |
 |----------|---------|------------|
-| clients/<slug>/ | nyoa-buyer-seller-comms, nyoa-pipeline, nyoa-weekly-review, nyoa-log | nyoa-client-add (creates), nyoa-log (timeline append), nyoa-buyer-seller-comms (timeline append) |
-| listings/<slug>/ | nyoa-listing-audit, nyoa-listing-copy, nyoa-listing-presentation, nyoa-social-content, nyoa-pipeline | nyoa-listing-new (creates), nyoa-listing-copy (copy.md write-through), nyoa-listing-presentation (copy.md write-through), nyoa-offer-analyzer (offers.md append) |
-| pipeline.md | nyoa-pipeline, nyoa-weekly-review | nyoa-client-add, nyoa-listing-new, nyoa-pipeline, nyoa-log (last-activity refresh) |
-| calendar.md | nyoa-weekly-review | nyoa-pipeline, nyoa-buyer-seller-comms (when scheduling) |
-| tasks.md | nyoa-weekly-review | any skill that surfaces a follow-up |
+| clients/<slug>/ | nyoa-buyer-seller-comms, nyoa-pipeline, nyoa-weekly-review, nyoa-log, nyoa-touch-cadence, nyoa-database-audit | nyoa-client-add (creates), nyoa-log (timeline append), nyoa-buyer-seller-comms (timeline append), nyoa-touch-cadence (timeline section append), nyoa-database-audit (segment tag append on profile) |
+| listings/<slug>/ | nyoa-listing-audit, nyoa-listing-copy, nyoa-listing-presentation, nyoa-social-content, nyoa-pipeline, nyoa-open-house, nyoa-contract-deadlines, nyoa-bookkeeping (settlement) | nyoa-listing-new (creates), nyoa-listing-copy (copy.md write-through), nyoa-listing-presentation (copy.md write-through), nyoa-offer-analyzer (offers.md append), nyoa-open-house (marketing/ folder), nyoa-contract-deadlines (deadlines.md), nyoa-bookkeeping (offers.md cross-link to settlement) |
+| listings/<slug>/deadlines.md | nyoa-pipeline, nyoa-weekly-review | nyoa-contract-deadlines (primary writer — appends, never overwrites) |
+| listings/<slug>/marketing/ | nyoa-listing-copy (for cross-reference) | nyoa-open-house (primary writer), nyoa-listing-copy (photoshoot-brief.md when requested) |
+| market-updates/<YYYY-MM>.md | nyoa-market-update (reads prior months), nyoa-social-content (can reference for narrative continuity), nyoa-neighborhood-page (for FAQ data points) | nyoa-market-update (primary writer — one file per month) |
+| web/neighborhoods/<slug>.md | nyoa-aeo (for AEO article cross-linking) | nyoa-neighborhood-page (primary writer) |
+| finance/<YYYY-MM>/ | nyoa-bookkeeping (prior months for category consistency) | nyoa-bookkeeping (primary writer — receipts.md, settlement-<slug>.md, mileage.md) |
+| pipeline.md | nyoa-pipeline, nyoa-weekly-review | nyoa-client-add, nyoa-listing-new, nyoa-pipeline, nyoa-log (last-activity refresh), nyoa-contract-deadlines, nyoa-open-house, nyoa-database-audit (snapshot section), nyoa-neighborhood-page (content-shipped note), nyoa-bookkeeping (settlement-filed note) |
+| calendar.md | nyoa-weekly-review, nyoa-contract-deadlines (reads prior entries), nyoa-bookkeeping (mileage mode) | nyoa-pipeline, nyoa-buyer-seller-comms (when scheduling), nyoa-contract-deadlines, nyoa-open-house, nyoa-market-update |
+| tasks.md | nyoa-weekly-review | any skill that surfaces a follow-up (incl. nyoa-contract-deadlines, nyoa-open-house, nyoa-touch-cadence, nyoa-database-audit, nyoa-neighborhood-page) |
 | templates/ | nyoa-buyer-seller-comms | agent manual + nyoa-setup |
-| reviews/ | nyoa-weekly-review (next week reads last week) | nyoa-weekly-review (primary writer) |
+| reviews/ | nyoa-weekly-review (next week reads last week), nyoa-database-audit (prior audits for year-over-year diffs) | nyoa-weekly-review (primary writer), nyoa-database-audit (database-audit-YYYY-MM-DD.md) |
 
 ## Context file formats
 
