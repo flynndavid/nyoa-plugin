@@ -17,6 +17,9 @@ Generate the messages an agent sends every week. SMS, email, or voicemail script
 - "Post-showing thank you to [buyer name]"
 - "Ask [past client] for a referral"
 - "Follow up on the [property] showing from yesterday"
+- "Birthday note for [past client]"
+- "Anniversary email for [client] — they're at year [N]"
+- "Closing day note for [client]"
 
 ## Workflow
 
@@ -48,6 +51,11 @@ Transactional:
 Follow-up:
 - `assets/templates/post-showing-thankyou.md` — same-day thank-you after a showing
 - `assets/templates/referral-ask.md` — post-close referral request
+
+Past-client relationship maintenance:
+- `assets/templates/past-client-birthday.md` — annual birthday note. No CTA — pure relationship.
+- `assets/templates/home-anniversary.md` — 1/2/3-year (with soft valuation offer) and 5+ year (with market narrative instead) variants.
+- `assets/templates/closing-day-note.md` — handwritten-style card the agent mails the day of closing. No CTA, no signature block, no brokerage logo.
 
 Agent-saved overrides:
 - `nyoa-workspace/templates/intro-emails.md` and `templates/follow-up-cadence.md` — if the agent has saved their own opener email or cadence, prefer those over the built-in templates. Always check the workspace first.

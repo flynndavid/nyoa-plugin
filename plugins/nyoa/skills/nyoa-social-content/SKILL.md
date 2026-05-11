@@ -16,6 +16,17 @@ Generate a week of social content that builds the agent's personal brand, local 
 - "Help me build my personal brand on social"
 - "Give me 5 posts for this week"
 
+### Instagram-specific modes (new in v0.7.0)
+
+The base skill produces a multi-platform weekly mix. These modes go deeper on Instagram specifically — see `references/instagram-playbook.md` for the patterns each mode uses.
+
+- **`monday-planner`** — full week's IG plan (5 feed posts across content pillars + 1 Reel concept + 2 Stories prompts) drawn from the agent's upcoming week. Triggers on "Monday planner", "this week's IG plan", "weekly Instagram plan".
+- **`welcome-dms`** — 5 distinct DM variations the agent can rotate when greeting new followers. Triggers on "welcome DMs", "new follower DMs", "greet my new followers".
+- **`info-replies`** — for a new listing post collecting "info" comments: 3 brief public-comment-reply variations + a clean DM script that delivers the listing details and a soft qualifying question. Triggers on "info comment replies", "info comments on my listing post".
+- **`engagement-reset`** — diagnostic: read the last 30 days of post performance, identify what's dragging reach, output a 7-day reset plan. Triggers on "engagement is down", "reach reset", "algorithm reset", "engagement diagnostic".
+- **`hashtag-audit`** — evaluate the agent's current hashtag set, label each tag (branded / location / niche / broad / oversized / undersized / stale), recommend a refreshed mix. Triggers on "hashtag audit", "review my hashtags", "refresh my hashtag set".
+- **`just-sold`** — from a single set of sale details, produce four matched outputs: IG caption, 3-frame Stories sequence, 15-30s Reel script, longer Facebook post. Triggers on "just sold post", "just sold multi-output", "we closed — post it".
+
 ## Inputs you need
 
 Required:
@@ -148,4 +159,5 @@ And from `nyoa-workspace/` (when present):
 
 ## Reference files
 
-- `references/content-types.md` — detailed specs for each content type with examples
+- `references/content-types.md` — detailed specs for each content type with examples.
+- `references/instagram-playbook.md` — the six Instagram-specific modes (monday-planner, welcome-dms, info-replies, engagement-reset, hashtag-audit, just-sold) with structure, examples, and compliance notes for each.

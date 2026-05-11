@@ -60,11 +60,14 @@ Read `nyoa-context/connectors.md`. If user has a stated preference for a capabil
 4. Expand into the **long description** (`assets/templates/long-description.md`).
 5. Draft the **three social variants** (`assets/templates/social-x.md`, `social-instagram.md`, `social-facebook.md` if requested — see note below).
 6. Draft the **email blast** (`assets/templates/email-blast.md`).
-7. Run the compliance pass on every output (see Compliance below).
-8. Write through to the workspace (see Workspace integration below).
-9. Deliver everything in one Markdown response, in this order: MLS · long · social-x · social-instagram · email blast.
+7. **Optional extras (v0.7.0):** if the agent asks for a `carousel` or `photoshoot brief`, also generate `assets/templates/carousel-script.md` (a 7-slide Instagram carousel script) and/or `assets/templates/photoshoot-brief.md` (the shot list, lifestyle setups, and prep checklist for the photographer). These are off by default — only included when asked.
+8. Run the compliance pass on every output (see Compliance below).
+9. Write through to the workspace (see Workspace integration below).
+10. Deliver everything in one Markdown response, in this order: MLS · long · social-x · social-instagram · email blast (+ carousel and/or photoshoot brief if requested).
 
 > **Social platforms:** Default set is X, Instagram, and a buyer email. If the user asks for Facebook, LinkedIn, or TikTok script, generate those too using the same voice — the templates are shaped enough to extend.
+
+> **Carousel and photoshoot brief (v0.7.0):** these are explicitly opt-in. Triggers — "7-slide carousel for this listing", "Instagram carousel script", "photoshoot brief", "shot list for the photographer", "what should the photographer shoot". The agent can ask for one, the other, or both.
 
 ## Compliance pass (mandatory before delivering)
 
