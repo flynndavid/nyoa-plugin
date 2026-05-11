@@ -19,6 +19,8 @@ The yard, the lot, the immediate block, walkability, neighborhood. **Verifiable 
 ### Paragraph 4 — The close
 Who this home is right for + the action. Ends on a buyer feeling, not an exclamation point.
 
+If `marketing/3d-tour.md` has a Tour URL, insert one sentence immediately before the close: "Walk every room in 3D at [URL] — photoreal, browser-based, no app." Skip silently if absent.
+
 ## Hard rules
 
 - 300–500 words

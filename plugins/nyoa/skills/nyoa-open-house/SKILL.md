@@ -51,10 +51,11 @@ Read `nyoa-context/connectors.md`. If the agent has a stated preference for a ca
 2. **Resolve voice.** Per-agent voice file → `nyoa-context/voice.md` → NYOA house style. Same order as every other skill.
 3. **Pick channels.** Default channel set is: Instagram feed post, Facebook event description, sphere email, text blast, three Stories frames (T-minus-4h / live / wrap), sign-in card copy. The agent can ask for a subset or add channels (LinkedIn, NextDoor, Threads).
 4. **Draft each channel** from the templates under `assets/templates/`. Use the same per-channel rules NYOA uses elsewhere (`nyoa-buyer-seller-comms/references/channel-conventions.md`) — SMS ≤ 320 chars, no emojis, no "Hi {first}"; email opens with the why-now not the hello.
-5. **Build the day-of run-of-show** (`assets/templates/day-of-runofshow.md`) — what the agent does at T-90, T-30, T-0, T+0–end, T+wrap. A practical checklist, not a script.
-6. **Run the compliance pass.**
-7. **Write through to the workspace.**
-8. **Deliver.**
+5. **3D tour add-on (conditional).** Check if `nyoa-workspace/listings/<slug>/marketing/3d-tour.md` exists with a non-empty Tour URL. If yes, append the open-house add-on insert from `nyoa-3d-tour/assets/templates/open-house-add-on.md` (long-form variant on Facebook event + sphere email; short-form variant on Instagram + Stories; skip for SMS). If no, render every channel without a tour mention — never invent a URL.
+6. **Build the day-of run-of-show** (`assets/templates/day-of-runofshow.md`) — what the agent does at T-90, T-30, T-0, T+0–end, T+wrap. A practical checklist, not a script.
+7. **Run the compliance pass.**
+8. **Write through to the workspace.**
+9. **Deliver.**
 
 ## Compliance pass (mandatory before delivering)
 

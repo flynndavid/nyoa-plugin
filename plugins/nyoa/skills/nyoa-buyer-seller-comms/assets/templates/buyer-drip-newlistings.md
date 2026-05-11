@@ -33,11 +33,14 @@ A new one hit MLS this morning that fits what you've been looking for in {{neigh
 · {{feature_3}}
 
 Listing page: {{link}}
+{{tour_line}}
 
 I have showing slots {{day_1}} and {{day_2}}. Want me to grab one?
 
 — {{agent_first}}
 ```
+
+**Conditional `{{tour_line}}`:** if `listings/<slug>/marketing/3d-tour.md` has a Tour URL, render `Walk it in 3D first: {{tour_url}}` on its own line above the showing-slots line. Skip silently if absent.
 
 **Example:**
 

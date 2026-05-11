@@ -54,7 +54,7 @@ Read `nyoa-context/connectors.md`. If user has a stated preference for a capabil
 - **docs** (`google-workspace` or `notion`): When available, NYOA offers to save the canonical `copy.md` to cloud storage (Drive or Notion) in addition to the local workspace write-through. Falls back to inline Markdown + `nyoa-workspace/listings/<slug>/copy.md`.
 - No other external capabilities required — all copy generation is local.
 
-1. Confirm the inputs. If anything required is missing, ask once and wait.
+1. Confirm the inputs. If anything required is missing, ask once and wait. Also check `nyoa-workspace/listings/<slug>/marketing/3d-tour.md` if present — if it has a Tour URL, every output below should include it (channel-specific format per `plugins/nyoa/references/3d-tours.md`).
 2. Resolve voice mode.
 3. Write the **MLS remarks** first (`assets/templates/mls-remarks.md`). The hook from the MLS remarks is the seed for everything else.
 4. Expand into the **long description** (`assets/templates/long-description.md`).
@@ -89,6 +89,17 @@ If `nyoa-workspace/listings/<slug>/` exists for the address (or one matches an e
 - Refresh `pipeline.md` last-activity date for the listing.
 
 If the listing folder doesn't exist, ask: "Want me to create `listings/<slug>/` so future copy + comps + showings live alongside this?" If yes, defer to `/nyoa-listing-add`. If no (or if `nyoa-workspace/` doesn't exist at all), skip the write-through silently — the inline Markdown response is still complete.
+
+## 3D tour integration
+
+If `nyoa-workspace/listings/<slug>/marketing/3d-tour.md` exists with a non-empty Tour URL field:
+
+- **MLS remarks** — append " · Walk it now in 3D: [URL]" only if total stays ≤500 chars; otherwise skip (the URL belongs in the MLS virtual-tour-link field, not the remarks).
+- **Long description** — insert a one-sentence "Walk every room in 3D at [URL]" before the close paragraph.
+- **Social X / Instagram** — append the tour link to the action block.
+- **Email blast** — insert the email link block snippet from `nyoa-3d-tour/assets/templates/embed-snippets.md` before the property block.
+
+If the file is absent or the Tour URL field is empty, render every output without a tour mention — never invent a URL or claim a tour exists. See `plugins/nyoa/references/3d-tours.md` for the canonical decision rule.
 
 ## Output format
 

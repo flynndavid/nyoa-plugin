@@ -3,7 +3,7 @@
 ## Professional Photography & Media
 - Professional photography session (XX–XX photos)
 - Twilight / drone shots if property and price tier warrant it
-- 3D walkthrough or video tour (if applicable)
+- **Photoreal 3D walkthrough** (3D Gaussian Splat) — captured via NYOA `/nyoa-3d-tour`, hosted at [URL when ready], embedded in MLS / website / buyer emails / yard-sign QR. Cost: $200–$800 (DIY $0–30 with phone, vendor $300–800). Value framing: 24/7 photoreal showings; out-of-state buyers walk it before flying in; serious buyers self-qualify before requesting a private showing.
 
 ## Listing Copy Package (powered by NYOA)
 - MLS remarks — hook-first, compliant, cliché-free

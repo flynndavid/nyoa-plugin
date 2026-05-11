@@ -54,7 +54,8 @@ nyoa-plugin/
         ├── nyoa-offer-analyzer/
         ├── nyoa-aeo/
         ├── nyoa-social-content/
-        └── nyoa-testimonial-engine/
+        ├── nyoa-testimonial-engine/
+        └── nyoa-3d-tour/                (v0.8.0 — $ARGUMENTS dispatch: vendor / capture / host / embed / promote)
 ```
 
 Each skill follows the same internal structure:

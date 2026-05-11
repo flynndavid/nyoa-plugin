@@ -24,6 +24,7 @@ One post, three moves:
 - {{hook_feature}}
 - {{anchor_number}} (price OR sqft OR year OR lot)
 - {{cta_or_link}}
+- {{tour_url}} (optional — appended to the action block when `marketing/3d-tour.md` has a Tour URL; skip silently if absent)
 
 ## Examples
 
