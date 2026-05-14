@@ -122,12 +122,22 @@ Only if the user asked for a demo / mock-up / visual rebuild AND photos are avai
 - Inline all CSS in `<style>`. The HTML must work as a single file opened from the local filesystem (`file://...`).
 - After writing, tell the user the absolute path to the file so they can open it in a browser.
 
-## Compliance guardrails
+## Compliance pass
 
-- **Never** include language implying preference for or against protected classes (race, color, religion, sex, disability, familial status, national origin). The rubric in `references/rubric.md` lists common red-flag phrases.
-- **Never** assert structural facts not in the source (no "fully renovated" if you can't verify it; no school district claims unless the listing stated them).
-- **Never** suggest removing or altering disclosures.
-- If the source has compliance issues, flag them as P0 in the audit and rewrite without them.
+Before delivering output, delegate to `/nyoa-compliance-review`:
+
+1. Generate the draft per the rest of this skill's workflow.
+2. Invoke `/nyoa-compliance-review` with the draft as input and this skill's name (`nyoa-listing-audit`) as the calling context.
+3. If the review returns **APPROVED**, deliver the draft. `/nyoa-compliance-review` appends the disclaimer footer and writes the audit-log entry — do not duplicate.
+4. If the review returns **FIX RECOMMENDED** or **FIX REQUIRED**, surface the findings to the user. Apply their chosen action:
+   - **Apply all** — use the cleaned draft as the final output.
+   - **Apply selected** — apply only the user-chosen fixes.
+   - **Override** — capture the user's one-sentence reason; `/nyoa-compliance-review` logs it.
+   - **Edit manually** — return the findings to the user and stop; they re-run the skill when ready.
+   Then deliver.
+5. If the agent's **own input** contained a fair-housing violation, surface it explicitly in your response in addition to letting `/nyoa-compliance-review` catch it.
+
+Canonical rules and jurisdictional reasoning live in `plugins/nyoa/references/compliance/fair-housing.md` (loaded by `/nyoa-compliance-review`). Do not duplicate them here.
 
 ## Examples
 
@@ -158,3 +168,5 @@ For the AEO portion specifically, see `references/site-audit-rubric.md` for the 
 ## Output format
 
 Always Markdown. Always headed with the property address and price (listing mode) or the site URL and primary market (site-audit mode). Always end with a "What I'd do first" 3-bullet summary so the agent can act in <2 minutes.
+
+The disclaimer footer is appended automatically by `/nyoa-compliance-review` — do not include it in this skill's own output template.

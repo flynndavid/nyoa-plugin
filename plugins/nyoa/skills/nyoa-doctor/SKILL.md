@@ -42,7 +42,7 @@ Inspect `$ARGUMENTS` before doing anything else:
    - If missing: report "No `_meta.json` found — workspace predates v0.6.0. Run `/nyoa-setup migrate` to upgrade (non-destructive, under a minute)." Skip the remaining schema checks.
 2. If `_meta.json` exists:
    - Read and parse it as JSON.
-   - Check `schema_version`. If it is not `"0.6.0"`, report: "Schema version mismatch: found `<value>`, expected `0.6.0`. Run `/nyoa-setup migrate`."
+   - Check `schema_version`. If it is not `"0.9.0"`, report: "Schema version mismatch: found `<value>`, expected `0.9.0`. Run `/nyoa-setup migrate`."
    - Report `workspace.backend` and `workspace.root_path`.
    - Report `setup.setup_complete` (true/false) and `setup.setup_last_round_completed` (0–8).
    - If `setup_complete` is `false`, note which round was last completed and suggest: "Run `/nyoa-setup resume` to continue."
@@ -58,10 +58,12 @@ Inspect `$ARGUMENTS` before doing anything else:
    - `competitors.md` missing → "Missing: `nyoa-context/competitors.md` — run `/nyoa-setup competitors` to populate."
    - `feedback.md` missing → "Missing: `nyoa-context/feedback.md` — no action required; it populates automatically as you correct NYOA."
    - `connectors.md` missing → "Missing: `nyoa-context/connectors.md` — run `/nyoa-connect` to detect your tools."
-3. Check that `nyoa-workspace/` exists and contains at minimum:
-   - `pipeline.md`, `calendar.md`, `tasks.md`
-4. For each missing workspace file, report: "Missing: `nyoa-workspace/<file>` — run `/nyoa-setup` to scaffold."
-5. If `nyoa-workspace/` is entirely absent: "No workspace found. Run `/nyoa-setup` to create it."
+3. **License state check.** If `nyoa-context/profile.md` exists, scan it for a `License state:` field (under the `## Licensing & affiliation` section). If the field is blank, set to `—`, or the section/field is absent, report: "`license_state` is not set in your profile. `/nyoa-compliance-review` will fall back to federal-only review. Run `/nyoa-setup identity` to fix."
+4. Check that `nyoa-workspace/` exists and contains at minimum:
+   - `pipeline.md`, `calendar.md`, `tasks.md`, `compliance-log.md`
+5. For each missing workspace file, report: "Missing: `nyoa-workspace/<file>` — run `/nyoa-setup` to scaffold."
+6. **Compliance log check.** If `nyoa-workspace/compliance-log.md` is missing, report: "Compliance log is missing. Run `/nyoa-setup workspace` to scaffold it, or it will be auto-created on the next generative skill run."
+7. If `nyoa-workspace/` is entirely absent: "No workspace found. Run `/nyoa-setup` to create it."
 
 ### Section 3 — Connectors
 
@@ -129,8 +131,10 @@ End with: `Voice used: NYOA house`.
 
 **Reads:**
 - `nyoa-context/_meta.json` — schema version and setup state
-- `nyoa-context/profile.md`, `voice.md`, `proofs.md`, `competitors.md`, `feedback.md`, `connectors.md` — presence check only
+- `nyoa-context/profile.md` — presence check + scan for `License state:` field
+- `nyoa-context/voice.md`, `proofs.md`, `competitors.md`, `feedback.md`, `connectors.md` — presence check only
 - `nyoa-workspace/pipeline.md` — stale entry detection
+- `nyoa-workspace/compliance-log.md` — presence check
 - `nyoa-workspace/clients/*/` — orphan detection
 - `nyoa-workspace/listings/*/` — orphan detection
 

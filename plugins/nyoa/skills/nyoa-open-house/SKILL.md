@@ -57,24 +57,22 @@ Read `nyoa-context/connectors.md`. If the agent has a stated preference for a ca
 8. **Write through to the workspace.**
 9. **Deliver.**
 
-## Compliance pass (mandatory before delivering)
+## Compliance pass
 
-Standard NYOA Fair Housing rules apply across every channel. Cross-check the package for:
+Before delivering output, delegate to `/nyoa-compliance-review`:
 
-- **No demographic targeting.** Open houses are public events. Promo copy can't say "perfect for families", "great for young couples", "in our [ethnic/religious] community". Speak to the property, not the buyer profile.
-- **No safety claims.** Don't say "safe neighborhood", "low crime", or anything implying a comparison.
-- **No school quality claims.** District names are OK if neutrally stated; "great schools" / "top-rated district" is not, unless you cite a verifiable, current source.
-- **"Primary bedroom"** not "master bedroom".
-- **No unsourced renovation claims.** Don't say "fully updated" or "new roof" unless the agent confirmed it (or it's already in `property.md`).
-- **No clichés.** Strip "must see", "stunning", "nestled", "boasts", "rare opportunity", "won't last", "luxury living awaits".
-- **Specific dates / times only.** Don't say "this weekend" — give the actual date and window.
-- **License + brokerage attribution.** Facebook event and email variants must include the agent name, brokerage, and license number footer. SMS and Stories don't (length / format constraints), but the agent should be identifiable from the sender.
+1. Generate the draft per the rest of this skill's workflow.
+2. Invoke `/nyoa-compliance-review` with the draft as input and this skill's name (`nyoa-open-house`) as the calling context.
+3. If the review returns **APPROVED**, deliver the draft. `/nyoa-compliance-review` appends the disclaimer footer and writes the audit-log entry — do not duplicate.
+4. If the review returns **FIX RECOMMENDED** or **FIX REQUIRED**, surface the findings to the user. Apply their chosen action:
+   - **Apply all** — use the cleaned draft as the final output.
+   - **Apply selected** — apply only the user-chosen fixes.
+   - **Override** — capture the user's one-sentence reason; `/nyoa-compliance-review` logs it.
+   - **Edit manually** — return the findings to the user and stop; they re-run the skill when ready.
+   Then deliver.
+5. If the agent's **own input** contained a fair-housing violation, surface it explicitly in your response in addition to letting `/nyoa-compliance-review` catch it.
 
-If the agent's input includes a Fair Housing violation, call it out: "I flagged 'great for families' in your features list — Fair Housing risk. Rewriting around the floor plan instead."
-
-Footer to include on the email and Facebook event variants:
-
-> Hosted under the Fair Housing Act. This event is open to every prospective buyer regardless of race, color, religion, sex, national origin, familial status, disability, or any other protected class. The promotion describes the property, not the people who might buy it.
+Canonical rules and jurisdictional reasoning live in `plugins/nyoa/references/compliance/fair-housing.md` (loaded by `/nyoa-compliance-review`). Do not duplicate them here.
 
 ## Workspace integration
 
@@ -105,6 +103,8 @@ Single Markdown response with these sections, each independently copyable:
 10. **Connector offers** — only if applicable.
 
 End with: "Voice used: <agent name | NYOA house>. Saved to nyoa-workspace/listings/<slug>/marketing/open-house-YYYY-MM-DD.md." (Skip the save line if no workspace.)
+
+The disclaimer footer is appended automatically by `/nyoa-compliance-review` — do not include it in this skill's own output template.
 
 ## Shared context
 

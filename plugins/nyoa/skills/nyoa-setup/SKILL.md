@@ -42,7 +42,7 @@ When invoked as `/nyoa-setup <mode>`, dispatch immediately to the corresponding 
 |------|--------|
 | _(no args)_ | Detect state → full interview or resume prompt |
 | `resume` | Read `_meta.json.setup.setup_last_round_completed` → start from that round + 1 |
-| `migrate` | Run the v0.5.x → v0.6.0 migration sub-workflow (see below) |
+| `migrate` | Run the v0.5.x → v0.9.0 migration sub-workflow (see below) |
 | `workspace` | Run Round 1 only (workspace detection / confirmation) |
 | `identity` | Run Round 2 only (business identity → `profile.md`) |
 | `voice` | Run Round 3 only (voice preferences → `voice.md`) |
@@ -63,12 +63,12 @@ This skill uses no external capabilities. It writes local files only (no email, 
 
 Before asking anything, check what already exists:
 
-1. **`nyoa-context/_meta.json` exists with `schema_version: "0.6.0"`** → This is a v0.6 workspace.
+1. **`nyoa-context/_meta.json` exists with `schema_version: "0.9.0"`** → This is a current workspace.
    - If `setup.setup_complete` is `true`: "Your NYOA workspace is fully set up. Use `/nyoa-setup <mode>` to update any section (e.g., `/nyoa-setup voice`). Or say 'go' to review what's there."
    - If `setup.setup_complete` is `false`: "You're partway through setup (last completed: Round N). Say 'resume' or run `/nyoa-setup resume` to continue."
 
 2. **`_meta.json` is missing but `nyoa-context/profile.md` exists** → v0.5.x workspace.
-   - "I found an existing v0.5.x workspace. Run `/nyoa-setup migrate` to upgrade it to v0.6.0, or I can do that now — it's non-destructive and takes under a minute. Which would you prefer?"
+   - "I found an existing v0.5.x workspace. Run `/nyoa-setup migrate` to upgrade it to v0.9.0, or I can do that now — it's non-destructive and takes under a minute. Which would you prefer?"
 
 3. **Neither exists** → First run. Proceed to Round 1 (workspace confirmation).
 
@@ -87,7 +87,7 @@ Ask one round at a time. Keep questions tight. Confirm answers as you go. Auto-s
 - If confirmed (default): write `nyoa-context/_meta.json`:
   ```json
   {
-    "schema_version": "0.6.0",
+    "schema_version": "0.9.0",
     "installed_at": "<today YYYY-MM-DD>",
     "setup": {
       "setup_complete": false,
@@ -100,7 +100,9 @@ Ask one round at a time. Keep questions tight. Confirm answers as you go. Auto-s
     },
     "agent": {
       "name": null,
-      "brokerage": null
+      "brokerage": null,
+      "license_state": null,
+      "nar_member": null
     }
   }
   ```
@@ -110,16 +112,51 @@ Ask one round at a time. Keep questions tight. Confirm answers as you go. Auto-s
 
 #### Round 2 — Identity (writes `nyoa-context/profile.md`, updates `_meta.json`)
 
+> Quick note before we start: these answers — especially your license state — determine which jurisdiction `/nyoa-compliance-review` applies when reviewing your output.
+
+Ask these in order. Group the licensing questions together at the end so it flows naturally:
+
 - Full name (as it appears in marketing)
-- Brokerage / team
-- License # + state
 - Years in real estate
 - Markets you serve (cities, neighborhoods, zip codes)
 - Service types (buyer / seller / investor / luxury / first-time / relocation / commercial / leasing)
 - Ideal client (1–2 sentences)
 - Top 2–3 differentiators (what makes you different from other agents in your market)
 
-After saving `profile.md`, update `_meta.json`: set `agent.name` and `agent.brokerage` from the answers above, and set `setup.setup_last_round_completed: 2`.
+**Licensing & affiliation** (ask as one group):
+- **License state** (REQUIRED — two-letter US state code, e.g. `TN`, `CA`, `NY`). Tell the agent: "This is the only required field — it tells `/nyoa-compliance-review` which state rules to apply on top of federal fair-housing."
+- License number (optional)
+- Brokerage / team name
+- Brokerage license number (optional)
+- NAR member? (yes / no — affects whether NAR Code of Ethics gets applied to compliance review)
+
+Write `nyoa-context/profile.md` with this structure (omit any optional field the agent skipped):
+
+```markdown
+# Agent Profile
+
+- Name: <full name>
+- Years in real estate: <N>
+- Markets served: <cities / neighborhoods / zip codes>
+- Service types: <list>
+- Ideal client: <1–2 sentences>
+- Differentiators:
+  - <one>
+  - <two>
+  - <three>
+
+## Licensing & affiliation
+
+- License state: <two-letter code>
+- License number: <number or "—">
+- Brokerage: <name>
+- Brokerage license: <number or "—">
+- NAR member: <yes / no>
+```
+
+After saving `profile.md`, update `_meta.json`: set `agent.name`, `agent.brokerage`, `agent.license_state`, and `agent.nar_member` from the answers above, and set `setup.setup_last_round_completed: 2`.
+
+If the agent declines to provide a `license_state`, note it in your save confirmation: "Saved — but no license state on file. `/nyoa-compliance-review` will fall back to federal-only review until you set one. Run `/nyoa-setup identity` later to add it."
 
 ---
 
@@ -243,7 +280,7 @@ Print a short summary:
 Set up:
 - nyoa-context/ — profile, voice, proofs, competitors
 - nyoa-workspace/ — N clients, M listings, pipeline initialized
-- _meta.json — workspace anchored, schema v0.6.0
+- _meta.json — workspace anchored, schema v0.9.0
 
 Next steps:
 1. …
@@ -255,7 +292,7 @@ Next steps:
 
 ### Migrate sub-workflow (`/nyoa-setup migrate`)
 
-Upgrades a v0.5.x workspace to v0.6.0. Non-destructive: never deletes or overwrites existing context files. Completes in under a minute.
+Upgrades a v0.5.x workspace to v0.9.0. Non-destructive: never deletes or overwrites existing context files. Completes in under a minute.
 
 **Step 1 — Backup.** Create `nyoa-workspace/.backups/v0.5-to-v0.6/<YYYY-MM-DD>/` and copy into it:
 - `nyoa-context/` (entire directory)
@@ -266,7 +303,7 @@ Confirm: "Backup created at `nyoa-workspace/.backups/v0.5-to-v0.6/<date>/`."
 **Step 2 — Write `_meta.json`.** Create `nyoa-context/_meta.json`:
 ```json
 {
-  "schema_version": "0.6.0",
+  "schema_version": "0.9.0",
   "installed_at": "<today YYYY-MM-DD>",
   "setup": {
     "setup_complete": true,
@@ -279,13 +316,15 @@ Confirm: "Backup created at `nyoa-workspace/.backups/v0.5-to-v0.6/<date>/`."
   },
   "agent": {
     "name": null,
-    "brokerage": null
+    "brokerage": null,
+    "license_state": null,
+    "nar_member": null
   }
 }
 ```
 Note: `setup_last_round_completed` is set to 7 (all v0.5.x rounds are treated as complete). The agent can run `/nyoa-setup connectors` (Round 8) whenever they're ready.
 
-If `nyoa-context/profile.md` exists and contains the agent's name and brokerage, parse and populate `agent.name` and `agent.brokerage` in `_meta.json`.
+If `nyoa-context/profile.md` exists, parse and populate `agent.name`, `agent.brokerage`, `agent.license_state`, and `agent.nar_member` in `_meta.json` where present. If `license_state` cannot be found in the existing profile, leave it `null` and warn the agent in the Step 6 confirmation: "Couldn't detect your license state from the existing profile. Run `/nyoa-setup identity` to add it — without it, `/nyoa-compliance-review` falls back to federal-only review."
 
 **Step 3 — Upgrade `connectors.md`.** Read existing `nyoa-context/connectors.md` (if present). Check whether the v0.6.0 sections "## User-stated preferences" and "## NYOA usage" are already there. If not, append them (preserving all existing content verbatim) using the format from `plugins/nyoa/references/context-formats.md`. If `connectors.md` does not exist, create it from the template.
 
@@ -299,9 +338,9 @@ If either is absent, append it (with empty content) at the end of the file. Neve
 
 **Step 6 — Confirm.** Print:
 ```
-Migration complete. Your workspace is now on v0.6.0.
+Migration complete. Your workspace is now on v0.9.0.
   - Backup: nyoa-workspace/.backups/v0.5-to-v0.6/<date>/
-  - Added: nyoa-context/_meta.json (schema v0.6.0)
+  - Added: nyoa-context/_meta.json (schema v0.9.0)
   - Updated: nyoa-context/connectors.md (v0.6 sections appended)
   - Updated: nyoa-workspace/pipeline.md (rolling sections added)
 
@@ -314,7 +353,7 @@ Try /nyoa-help for the full skill directory, or /nyoa-setup connectors to wire u
 
 ## Compliance pass
 
-- If the agent pasted writing samples that contain Fair Housing red-flag language, flag them in `voice.md` under a `## Phrases to avoid (auto-flagged)` section. Do not silently strip them — surface so the agent learns. See the canonical Fair Housing red-flag list in `nyoa-listing-copy/references/voice-presets.md`.
+- If the agent pasted writing samples that contain Fair Housing red-flag language, flag them in `voice.md` under a `## Phrases to avoid (auto-flagged)` section. Do not silently strip them — surface so the agent learns. See the canonical Fair Housing red-flag list in `plugins/nyoa/references/compliance/fair-housing.md`.
 - License #, lockbox codes, or other sensitive info pasted by the agent: save only to local files (never to logs, never to outputs shared externally). Remind the agent that `nyoa-workspace/` is a local folder.
 - If a competitor is named, record neutral facts only — never disparaging language.
 - No invented facts: use `[VERIFY FACT]` for uncertain claims, `[INSERT PROOF]` for needed-but-missing testimonials.
@@ -349,4 +388,5 @@ Reads during state detection:
 - `plugins/nyoa/references/workspace-io.md` — workspace I/O contract (path resolution, read/write rules)
 - `plugins/nyoa/assets/workspace-template/` — the workspace skeleton scaffolded in Step 3
 - `plugins/nyoa/migrations/0.6.0/index.md` — what changed in v0.6.0 schema and migration steps
-- `nyoa-listing-copy/references/voice-presets.md` — Fair Housing red-flag list (referenced in compliance pass)
+- `plugins/nyoa/migrations/0.9.0/index.md` — what changed in v0.9.0 (new identity fields, /nyoa-compliance-review delegation)
+- `plugins/nyoa/references/compliance/fair-housing.md` — Fair Housing red-flag list (referenced in compliance pass)

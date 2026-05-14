@@ -98,6 +98,9 @@ Format as a clean, scannable list with four tiers. One line per skill: `/nyoa-<s
 /nyoa-aeo                  — create answer-engine-optimized articles to own local search queries
 /nyoa-testimonial-engine   — draft review requests and format testimonials for reuse
 
+## Compliance
+/nyoa-compliance-review — Fair-housing and advertising compliance check. Called automatically by every generative skill; also usable standalone on any pasted draft.
+
 ## Hygiene
 /nyoa-doctor  — audit workspace completeness and flag stale or missing content
 /nyoa-find    — search across workspace for a client, listing, or piece of content

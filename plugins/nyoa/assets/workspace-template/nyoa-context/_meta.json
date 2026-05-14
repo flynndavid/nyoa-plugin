@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.6.0",
+  "schema_version": "0.9.0",
   "installed_at": "YYYY-MM-DD",
   "setup": {
     "setup_complete": false,
@@ -12,6 +12,8 @@
   },
   "agent": {
     "name": null,
-    "brokerage": null
+    "brokerage": null,
+    "license_state": null,
+    "nar_member": null
   }
 }

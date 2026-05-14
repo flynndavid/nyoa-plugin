@@ -122,20 +122,24 @@ The wizard (default mode) routes as follows:
 8. Update `marketing/3d-tour.md` with `Last promoted: YYYY-MM-DD`.
 9. Offer to push the buyer email to the email connector if available.
 
-## Compliance pass (mandatory before delivering)
+## Compliance pass
 
-Standard NYOA Fair Housing rules apply — see `nyoa-listing-copy/references/voice-presets.md` for the canonical red-flag list. The 3D-tour-specific additions:
+*Applies to `promote` mode only — other modes (vendor, capture, host, embed) do not produce outward-facing copy.*
 
-- **Occupants in the scan.** Splat scans capture whoever is in frame. Flag any vendor brief or capture checklist output that doesn't include "no occupants in frame; remove personal photos and family photos before scanning". Privacy + Fair Housing both matter — a tour that shows the seller's family on the wall is showing buyers something they shouldn't be seeing.
-- **"Walk to church / synagogue / mosque"** captions on tour promo posts — same rule as listing copy.
-- **Disability/accessibility claims off the scan** — never assert "wheelchair accessible" or "ADA compliant" because a wheelchair could roll through the splat. Use specific, agent-confirmed features: "step-free entry shown at 0:14 in the tour", "36-inch hallway widths". The scan is evidence, not certification.
-- **Address + scan privacy** — for the vendor brief, include the standard scan-prep checklist line: "remove visible mail, prescriptions, financial documents, and visible street numbers from car license plates in the driveway".
-- **No invented vendor names** — the skill does not maintain a verified vendor directory. The vendor brief is template + send instructions; the agent sources their own vendor (Craigslist, local photographer network, NextDoor, freelance Polycam/Luma operators on social).
-- **No invented capability claims** — never say "tour increases offers by X%" without a citation. Use directional language: "out-of-state buyers can pre-walk before flying in", "serious buyers self-qualify before requesting a showing".
-- **"Primary bedroom"** not "master bedroom" in any promo copy.
-- **Cliché ban** — strip "stunning", "must see", "nestled", "boasts", "rare opportunity" from promo copy.
+Before delivering output, delegate to `/nyoa-compliance-review`:
 
-If the agent's input contains a Fair Housing red flag, surface it: "I flagged 'great for families to walk through together' in your input — Fair Housing risk. Rewriting around the property tour itself."
+1. Generate the draft per the rest of this skill's workflow.
+2. Invoke `/nyoa-compliance-review` with the draft as input and this skill's name (`nyoa-3d-tour`) as the calling context.
+3. If the review returns **APPROVED**, deliver the draft. `/nyoa-compliance-review` appends the disclaimer footer and writes the audit-log entry — do not duplicate.
+4. If the review returns **FIX RECOMMENDED** or **FIX REQUIRED**, surface the findings to the user. Apply their chosen action:
+   - **Apply all** — use the cleaned draft as the final output.
+   - **Apply selected** — apply only the user-chosen fixes.
+   - **Override** — capture the user's one-sentence reason; `/nyoa-compliance-review` logs it.
+   - **Edit manually** — return the findings to the user and stop; they re-run the skill when ready.
+   Then deliver.
+5. If the agent's **own input** contained a fair-housing violation, surface it explicitly in your response in addition to letting `/nyoa-compliance-review` catch it.
+
+Canonical rules and jurisdictional reasoning live in `plugins/nyoa/references/compliance/fair-housing.md` (loaded by `/nyoa-compliance-review`). Do not duplicate them here.
 
 ## Workspace integration
 
@@ -165,6 +169,8 @@ Single Markdown response. Mode-specific:
 - **`promote`** — sections in order: X post · Instagram caption · Facebook post · Buyer email blast · Open-house add-on insert · Yard-sign QR caption. Each independently copyable.
 
 End every output with: "Voice used: <agent | NYOA house | n/a (operational)>. Saved to nyoa-workspace/listings/<slug>/marketing/3d-tour.md." (Skip the save line when no workspace.)
+
+The disclaimer footer is appended automatically by `/nyoa-compliance-review` — do not include it in this skill's own output template.
 
 ## Shared context
 

@@ -65,15 +65,22 @@ Read `nyoa-context/connectors.md`. If user has a stated preference for a capabil
 10. Write through to the workspace (see Workspace integration below).
 11. Deliver as a single Markdown response with each section independently copyable into Canva, Google Slides, or direct use.
 
-## Compliance pass (mandatory before delivering)
+## Compliance pass
 
-Scan every output for:
+Before delivering output, delegate to `/nyoa-compliance-review`:
 
-- **Fair Housing red flags** — no neighborhood demographic claims ("family-friendly area", "great schools" without source, "diverse community", "quiet neighborhood"). Describe the neighborhood by amenities, proximity, and infrastructure — not by the people who live there.
-- **"Master bedroom"** → replace with "primary bedroom".
-- **Unsourced structural claims** — never write "fully renovated", "new roof", "completely updated" unless the agent confirmed it.
-- **Pricing guarantees** — never guarantee a sale price or timeline. Use language like "based on recent comp activity, a competitive list price range would be…"
-- **Comp accuracy** — never invent comparable sales. All comp data must come from the agent's input or `nyoa-workspace/listings/<slug>/comps.md`.
+1. Generate the draft per the rest of this skill's workflow.
+2. Invoke `/nyoa-compliance-review` with the draft as input and this skill's name (`nyoa-listing-presentation`) as the calling context.
+3. If the review returns **APPROVED**, deliver the draft. `/nyoa-compliance-review` appends the disclaimer footer and writes the audit-log entry — do not duplicate.
+4. If the review returns **FIX RECOMMENDED** or **FIX REQUIRED**, surface the findings to the user. Apply their chosen action:
+   - **Apply all** — use the cleaned draft as the final output.
+   - **Apply selected** — apply only the user-chosen fixes.
+   - **Override** — capture the user's one-sentence reason; `/nyoa-compliance-review` logs it.
+   - **Edit manually** — return the findings to the user and stop; they re-run the skill when ready.
+   Then deliver.
+5. If the agent's **own input** contained a fair-housing violation, surface it explicitly in your response in addition to letting `/nyoa-compliance-review` catch it.
+
+Canonical rules and jurisdictional reasoning live in `plugins/nyoa/references/compliance/fair-housing.md` (loaded by `/nyoa-compliance-review`). Do not duplicate them here.
 
 ## Workspace integration
 
@@ -99,6 +106,8 @@ Single Markdown response with clear `##` headings for each section. Each section
 7. **Timeline & Next Steps** — what happens after the seller signs (photography day, listing live date, first open house, first showing feedback report)
 
 End with: "Voice used: <agent name | NYOA house>." If workspace write-through ran, also confirm: "Saved to nyoa-workspace/listings/<slug>/presentation-<YYYY-MM-DD>.md."
+
+The disclaimer footer is appended automatically by `/nyoa-compliance-review` — do not include it in this skill's own output template.
 
 ## Shared context
 

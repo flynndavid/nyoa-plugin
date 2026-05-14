@@ -176,30 +176,24 @@ End every output with: "Voice used: <agent name | preset name | NYOA house>".
 
 ## Compliance baseline (mandatory in every skill)
 
-Every skill that produces user-visible content must run a compliance pass before delivering:
+Every skill that produces user-visible content must delegate compliance review to **`/nyoa-compliance-review`** before delivering output.
 
-### Fair Housing red flags (always strip)
+The canonical fair-housing rules + jurisdictional reasoning instructions live at `plugins/nyoa/references/compliance/fair-housing.md` — loaded by `/nyoa-compliance-review`. Skills should not duplicate the rules; they delegate.
 
-- "Great for families", "perfect for kids", "family neighborhood", "growing family"
-- "Walk to church / synagogue / mosque" → "walk to [main street name]"
-- "Christian / Jewish / Muslim community", any ethnic / religious neighborhood claim
-- "Bachelor pad", "perfect for newlyweds", "couples retreat"
-- "Exclusive" (when paired with protected class)
-- "Great schools" (without source — only "in [district] district" if verifiable)
-- "Quiet [ethnic] neighborhood"
-- "Handicap accessible" → use specific ADA features ("single-level", "step-free entry", "wide doorways")
+### How a generative skill handles compliance
 
-### Other mandatory rules
+1. Generate the draft per the rest of the skill's workflow.
+2. Invoke `/nyoa-compliance-review` with the draft + this skill's name as the calling context.
+3. If APPROVED, deliver the draft. The review skill appends the disclaimer footer and writes the audit-log entry — do not duplicate.
+4. If FIX RECOMMENDED or FIX REQUIRED, surface findings to the user and let them choose: apply all / apply selected / override with reason / edit manually. Apply the choice, then deliver.
 
-- **"Master bedroom"** → always replace with "primary bedroom"
-- **No unsourced structural claims** — never assert "fully renovated", "new roof / HVAC / electrical" unless agent confirmed. Soften or remove.
-- **No invented facts** — awards, years in business, team size, statistics, testimonials. Use `[VERIFY FACT]` for uncertain claims, `[INSERT PROOF]` for needed-but-missing testimonials.
-- **No invented MCP server names** — `/nyoa-connect` only records connectors we can verify (detected in session, or confirmed publicly via official MCP registry / vendor publications). For categories without a verified public MCP (CRM, e-sign, SMS, MLS), record the gap and use file-only fallback.
-- **No clichés** — strip "stunning", "must see", "nestled", "boasts", "rare opportunity", "luxury living awaits", "don't miss". Replace with concrete specifics.
+If the agent's own input contains a fair-housing violation, the skill should also surface it explicitly in its response — in addition to letting `/nyoa-compliance-review` catch it.
 
-If the **agent's own input** contains a Fair Housing violation, surface it explicitly: "I flagged 'great for families' in your input — Fair Housing risk. Rewriting around the lifestyle without the demographic claim."
+### Why delegation, not blocklists
 
-The canonical Fair Housing red-flag list lives at `nyoa-listing-copy/references/voice-presets.md`. Reference it from new skills rather than duplicating.
+`/nyoa-compliance-review` applies Claude's own jurisdictional reasoning (federal + the agent's state + NAR if applicable + FTC AI advertising). This catches paraphrases a static blocklist would miss and scales to 50 states without maintaining per-state files. The audit log at `nyoa-workspace/compliance-log.md` records every review decision — including overrides with reasons — which is the defensibility artifact if a complaint ever lands.
+
+Canonical reference: `plugins/nyoa/references/compliance/fair-housing.md`. Disclaimer template: `plugins/nyoa/references/compliance/disclaimer.md`.
 
 ---
 
@@ -454,6 +448,7 @@ As of v0.5.0, NYOA is a real estate operating system. The following are in scope
 - **Onboarding and connector detection** — guiding the agent through first run, recording which MCPs they have available, branching skill behavior accordingly.
 - **Workspace write-through from content skills** — listing-copy / listing-presentation / social-content / buyer-seller-comms drop their canonical output into `nyoa-workspace/` so the workspace is the source of truth.
 - **MCP-aware skills** — skills should read `nyoa-context/connectors.md` and offer to use connectors when available, but never require them.
+- **Compliance reasoning via Claude** — `/nyoa-compliance-review` applies federal Fair Housing Act + the agent's state rules + NAR Code of Ethics (where applicable) + FTC AI advertising guidance using Claude's own jurisdictional knowledge. Every generative skill delegates to it. The audit log at `nyoa-workspace/compliance-log.md` records every decision.
 
 ## Out of scope (intentionally not in this plugin)
 
@@ -462,6 +457,8 @@ These were considered and rejected:
 - **Real-time external data fetches without an agent-installed MCP** — NYOA does not ship MCP servers, only consume the ones the agent has wired up. We won't bundle Gmail / Calendar / DocuSign / CRM integrations because their auth is per-agent and the MCP landscape changes.
 - **Daily Briefing / new-listing alerts via MLS** — needs MLS API integration, regionally fragmented, gated. Lives as a standalone SaaS product, not a Claude skill.
 - **Transaction checklists at state-specific compliance level** — too state-specific and brokerage-specific. The generic checklist in `assets/workspace-template/templates/closing-checklist.md` is intentionally generic.
+- **Per-state deep rule packs** — we don't maintain static state-specific rule files. `/nyoa-compliance-review` applies Claude's reasoning over the agent's `license_state`. We'd promote a specific state to a static pack only if Claude's reasoning proves unreliable for it in practice.
+- **Brokerage AI policy upload slot** — deferred. v1.0 will add a slot in `nyoa-context/` for the agent's brokerage AI policy to be loaded by `/nyoa-compliance-review` as an override layer.
 - **Standalone CMA generator with auto-pulled comps** — needs MLS API for real comp pulls. Comp analysis is embedded in `nyoa-listing-presentation` where the agent provides their own comps (or files them in `listings/<slug>/comps.md`).
 - **Naming made-up MCP servers** — see compliance baseline. `/nyoa-connect` records only verified, public MCPs. If we don't know it exists, we don't name it.
 
