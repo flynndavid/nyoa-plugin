@@ -42,7 +42,7 @@ When invoked as `/nyoa-setup <mode>`, dispatch immediately to the corresponding 
 |------|--------|
 | _(no args)_ | Detect state → full interview or resume prompt |
 | `resume` | Read `_meta.json.setup.setup_last_round_completed` → start from that round + 1 |
-| `migrate` | Run the v0.5.x → v0.6.0 migration sub-workflow (see below) |
+| `migrate` | Run the v0.5.x → v0.9.0 migration sub-workflow (see below) |
 | `workspace` | Run Round 1 only (workspace detection / confirmation) |
 | `identity` | Run Round 2 only (business identity → `profile.md`) |
 | `voice` | Run Round 3 only (voice preferences → `voice.md`) |
@@ -68,7 +68,7 @@ Before asking anything, check what already exists:
    - If `setup.setup_complete` is `false`: "You're partway through setup (last completed: Round N). Say 'resume' or run `/nyoa-setup resume` to continue."
 
 2. **`_meta.json` is missing but `nyoa-context/profile.md` exists** → v0.5.x workspace.
-   - "I found an existing v0.5.x workspace. Run `/nyoa-setup migrate` to upgrade it to v0.6.0, or I can do that now — it's non-destructive and takes under a minute. Which would you prefer?"
+   - "I found an existing v0.5.x workspace. Run `/nyoa-setup migrate` to upgrade it to v0.9.0, or I can do that now — it's non-destructive and takes under a minute. Which would you prefer?"
 
 3. **Neither exists** → First run. Proceed to Round 1 (workspace confirmation).
 
@@ -280,7 +280,7 @@ Print a short summary:
 Set up:
 - nyoa-context/ — profile, voice, proofs, competitors
 - nyoa-workspace/ — N clients, M listings, pipeline initialized
-- _meta.json — workspace anchored, schema v0.6.0
+- _meta.json — workspace anchored, schema v0.9.0
 
 Next steps:
 1. …
@@ -292,7 +292,7 @@ Next steps:
 
 ### Migrate sub-workflow (`/nyoa-setup migrate`)
 
-Upgrades a v0.5.x workspace to v0.6.0. Non-destructive: never deletes or overwrites existing context files. Completes in under a minute.
+Upgrades a v0.5.x workspace to v0.9.0. Non-destructive: never deletes or overwrites existing context files. Completes in under a minute.
 
 **Step 1 — Backup.** Create `nyoa-workspace/.backups/v0.5-to-v0.6/<YYYY-MM-DD>/` and copy into it:
 - `nyoa-context/` (entire directory)
@@ -338,9 +338,9 @@ If either is absent, append it (with empty content) at the end of the file. Neve
 
 **Step 6 — Confirm.** Print:
 ```
-Migration complete. Your workspace is now on v0.6.0.
+Migration complete. Your workspace is now on v0.9.0.
   - Backup: nyoa-workspace/.backups/v0.5-to-v0.6/<date>/
-  - Added: nyoa-context/_meta.json (schema v0.6.0)
+  - Added: nyoa-context/_meta.json (schema v0.9.0)
   - Updated: nyoa-context/connectors.md (v0.6 sections appended)
   - Updated: nyoa-workspace/pipeline.md (rolling sections added)
 
@@ -353,7 +353,7 @@ Try /nyoa-help for the full skill directory, or /nyoa-setup connectors to wire u
 
 ## Compliance pass
 
-- If the agent pasted writing samples that contain Fair Housing red-flag language, flag them in `voice.md` under a `## Phrases to avoid (auto-flagged)` section. Do not silently strip them — surface so the agent learns. See the canonical Fair Housing red-flag list in `nyoa-listing-copy/references/voice-presets.md`.
+- If the agent pasted writing samples that contain Fair Housing red-flag language, flag them in `voice.md` under a `## Phrases to avoid (auto-flagged)` section. Do not silently strip them — surface so the agent learns. See the canonical Fair Housing red-flag list in `plugins/nyoa/references/compliance/fair-housing.md`.
 - License #, lockbox codes, or other sensitive info pasted by the agent: save only to local files (never to logs, never to outputs shared externally). Remind the agent that `nyoa-workspace/` is a local folder.
 - If a competitor is named, record neutral facts only — never disparaging language.
 - No invented facts: use `[VERIFY FACT]` for uncertain claims, `[INSERT PROOF]` for needed-but-missing testimonials.
@@ -388,4 +388,5 @@ Reads during state detection:
 - `plugins/nyoa/references/workspace-io.md` — workspace I/O contract (path resolution, read/write rules)
 - `plugins/nyoa/assets/workspace-template/` — the workspace skeleton scaffolded in Step 3
 - `plugins/nyoa/migrations/0.6.0/index.md` — what changed in v0.6.0 schema and migration steps
-- `nyoa-listing-copy/references/voice-presets.md` — Fair Housing red-flag list (referenced in compliance pass)
+- `plugins/nyoa/migrations/0.9.0/index.md` — what changed in v0.9.0 (new identity fields, /nyoa-compliance-review delegation)
+- `plugins/nyoa/references/compliance/fair-housing.md` — Fair Housing red-flag list (referenced in compliance pass)

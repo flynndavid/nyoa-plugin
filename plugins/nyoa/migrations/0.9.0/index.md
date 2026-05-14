@@ -30,11 +30,11 @@ This is the defensibility artifact if a complaint ever lands. Overrides record t
 
 ### New `nyoa-context/profile.md` fields
 
-To support state-aware review and NAR-conditional logic, three fields are now required in `nyoa-context/profile.md`:
+To support state-aware review and NAR-conditional logic, four fields are now captured in `nyoa-context/profile.md` (`license_state` is required; the rest are recommended):
 
 - `license_state` — two-letter state code (e.g. `TN`, `CA`).
 - `license_number` — the agent's real estate license number (used in audit log notes and in advertising disclosure where the state requires it).
-- `brokerage_name` — the agent's brokerage (most states require it on advertising).
+- `brokerage` — the agent's brokerage (most states require it on advertising). Mirrored to `_meta.json` under `agent.brokerage`.
 - `nar_member` — `yes` or `no`. Determines whether NAR Code of Ethics Articles 10 and 12 are applied.
 
 If any of these is missing or blank when `/nyoa-compliance-review` runs, the skill warns the user, runs federal-only review, and nudges them to run `/nyoa-setup identity`.
@@ -49,7 +49,7 @@ If any of these is missing or blank when `/nyoa-compliance-review` runs, the ski
 
 ### 1. Re-run `/nyoa-setup` (or `/nyoa-setup identity`)
 
-This is the only required step. The identity round now captures `license_state`, `license_number`, `brokerage_name`, and `nar_member`. Run it once and every future compliance review picks up the new fields automatically.
+This is the only required step. The identity round now captures `license_state`, `license_number`, `brokerage`, and `nar_member`. Run it once and every future compliance review picks up the new fields automatically.
 
 ```
 /nyoa-setup identity

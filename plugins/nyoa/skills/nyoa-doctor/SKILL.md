@@ -42,7 +42,7 @@ Inspect `$ARGUMENTS` before doing anything else:
    - If missing: report "No `_meta.json` found — workspace predates v0.6.0. Run `/nyoa-setup migrate` to upgrade (non-destructive, under a minute)." Skip the remaining schema checks.
 2. If `_meta.json` exists:
    - Read and parse it as JSON.
-   - Check `schema_version`. If it is not `"0.6.0"`, report: "Schema version mismatch: found `<value>`, expected `0.6.0`. Run `/nyoa-setup migrate`."
+   - Check `schema_version`. If it is not `"0.9.0"`, report: "Schema version mismatch: found `<value>`, expected `0.9.0`. Run `/nyoa-setup migrate`."
    - Report `workspace.backend` and `workspace.root_path`.
    - Report `setup.setup_complete` (true/false) and `setup.setup_last_round_completed` (0–8).
    - If `setup_complete` is `false`, note which round was last completed and suggest: "Run `/nyoa-setup resume` to continue."
