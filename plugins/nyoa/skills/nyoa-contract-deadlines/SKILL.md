@@ -54,14 +54,21 @@ Read `nyoa-context/connectors.md`. If the agent has a stated preference for a ca
 7. **Run the compliance pass.**
 8. **Deliver inline as Markdown.**
 
-## Compliance pass (mandatory before delivering)
+## Compliance pass
 
+This skill produces an agent-facing deadline schedule. Most of it stays internal, but deadline reminders and consequence notes may get copied into client emails or texts.
+
+- **If you copy any part of this output into outward-facing communication** (deadline reminders to buyers/sellers, escrow updates, lender chase emails), run `/nyoa-compliance-review` on the drafted message first.
+- **Sensitive data stays local:** contract dollar amounts, earnest money figures, escrow/title contact details, and any client PII written to `nyoa-workspace/listings/<slug>/` files only.
 - **Never assert a date as authoritative.** The contract is the authoritative source; this output is a first-pass reading. The footer says so plainly.
-- **Flag ambiguity, don't guess.** If a clause says "ten days" without specifying business vs. calendar days, mark the date as `(verify — business vs. calendar days unclear)`.
+- **Flag ambiguity, don't guess.** If a clause says "ten days" without specifying business vs. calendar days, mark the date as `(verify — business vs. calendar days unclear)`. Use `[VERIFY]` placeholders when source data is missing.
 - **Never compute past a state-specific holiday rule we don't know.** If a deadline lands on a weekend or recognized holiday and the contract doesn't specify rollover, flag it.
 - **Don't invent contingencies.** Only extract what's actually in the document. If the agent says "we waived inspection", honor that and note it; don't infer waivers from absence.
 - **Don't drop legal language.** When recording a consequence, paraphrase ("buyer may lose earnest money") rather than quoting boilerplate — but if the contract uses a specific term of art ("time is of the essence", "specific performance"), keep that term in the entry.
 - **NYOA terminology in any quoted contract language.** If a clause refers to "master bedroom" / "master bath", substitute "primary bedroom" / "primary bath" in any consumer-facing version of the schedule. Keep the original phrasing in the per-deadline detail if it matters for legal interpretation, but flag the substitution explicitly so the agent knows which doc says what.
+- **No disparaging language** about opposing parties, lenders, escrow, title, or clients in any record.
+
+Canonical fair-housing rules: `plugins/nyoa/references/compliance/fair-housing.md`.
 
 Footer to include verbatim on every output:
 

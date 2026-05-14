@@ -85,13 +85,21 @@ Read `nyoa-context/connectors.md`. If the agent has a stated preference for a ca
 5. **Write outputs to `nyoa-workspace/finance/<YYYY-MM>/`.**
 6. **Deliver inline as Markdown.**
 
-## Compliance pass (mandatory before delivering, every mode)
+## Compliance pass
 
+This skill operates on local files only and produces internal financial records. The compliance focus is data handling and accuracy, not fair-housing language.
+
+- **PII stays local:** account numbers, settlement figures, commission amounts, and any client financial details stay in `nyoa-workspace/finance/` files only — never copied into outward-facing communication.
+- **No invented numbers:** never fabricate transaction amounts, dates, or counts. Extracted amounts come straight from the source document. If a number is unreadable on a PDF, flag it and ask the agent to verify rather than guessing.
 - **No tax advice.** NYOA categorizes; the CPA decides deductibility. Never write "this is deductible" — write "categorized as Marketing" and let the bookkeeper confirm treatment.
 - **Flag the close calls.** Any line that could go in two categories gets explicitly flagged in the output (e.g., "May 30 laminator $89 — Office or Marketing depending on use"). The agent decides; we don't.
 - **Honor brokerage agreements.** For `settlement`, never compute a net commission that contradicts the brokerage split percentage. If the split on file disagrees with what the statement implies, surface the disagreement — don't override.
-- **No tampering with the source numbers.** Extracted amounts come straight from the source document. If a number is unreadable on the PDF, flag it and ask the agent to verify rather than guessing.
 - **For `mileage`: the IRS wants contemporaneous records.** A calendar-derived log is a starting point, not a substitute for a real-time mileage app. State that explicitly in the footer.
+- **No disparaging language** about clients, vendors, brokerages, or bookkeepers in any record.
+
+If this skill's output is ever copied into outward-facing communication, run `/nyoa-compliance-review` on it first.
+
+Canonical fair-housing rules: `plugins/nyoa/references/compliance/fair-housing.md`.
 
 Footers (one per mode, included verbatim on the relevant output):
 
