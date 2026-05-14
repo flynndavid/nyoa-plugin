@@ -53,12 +53,19 @@ Read `nyoa-context/connectors.md`. If the agent has a stated preference for a ca
 7. **Write to workspace.**
 8. **Deliver inline as Markdown.**
 
-## Compliance pass (mandatory before delivering)
+## Compliance pass
 
+This skill produces an agent-facing segmentation report and writes tags into local client profiles. The report itself is internal, but recommended actions per segment may seed outward-facing comms.
+
+- **If you copy any part of this output into outward-facing communication** (segment-specific emails, reactivation sequences, goodbye notes), run `/nyoa-compliance-review` on the drafted message first.
 - **Honor unsubscribes.** Any contact with `unsubscribed: true` or `do-not-contact: true` in their profile goes to D regardless of activity. They never appear in any segment's "next action" outreach plan.
 - **No segmentation for marketing without consent.** D-segment contacts are not "send a goodbye email and archive". They're "leave alone and archive folder reference". Don't draft a goodbye email unless the agent explicitly asks.
 - **No protected-class segmentation.** Never segment by anything that resembles a protected class (age, family status, religion, etc.) even if the agent's `profile.md` records it.
+- **PII stays local:** segment tags, contact details, and segmentation reasoning live in `nyoa-workspace/` files only — never in outputs intended for external sharing.
 - **No invented activity.** If a client has no timeline file, don't infer activity from elsewhere. Mark them "no activity logged" and segment based on last `pipeline.md` mention or `profile.md` create date.
+- **No disparaging language** about contacts in any record (the segment reason is neutral fact — "last activity 14 months ago", not "cold and unresponsive").
+
+Canonical fair-housing rules: `plugins/nyoa/references/compliance/fair-housing.md`.
 
 Footer to include on the output (verbatim):
 

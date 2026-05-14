@@ -95,14 +95,20 @@ If the agent asks for a counter:
 - Suggest which terms to counter on vs. which to accept
 - Output as talking points, not legal language
 
-### 7. Compliance pass
+## Compliance pass
 
-Scan every output for:
-- **Legal disclaimer** — always include: "This summary is for informational purposes. It is not legal advice. Consult your attorney before making binding decisions."
-- **Fair Housing** — never evaluate offers based on the identity or perceived identity of the buyer. Evaluate only on terms.
-- **No invented terms** — never assert contract terms not present in the source text. If something is ambiguous, flag it: "This clause is unclear — verify with your broker."
-- **No unauthorized legal advice** — frame as analysis and summary, never as legal counsel. Use "consider" and "may want to" rather than "you should" or "you must."
-- **Response deadline** — always state the response deadline prominently if one exists in the offer.
+This skill produces agent-facing offer analysis. Most outputs stay private to the agent, but the plain-English summary, recommendation, and counter-offer talking points are typically pasted into seller briefings, emails, or voicemails.
+
+- **If you copy any part of this output into outward-facing communication** (seller email, voicemail script, written briefing, message to opposing agent), run `/nyoa-compliance-review` on it first.
+- **Sensitive data stays local:** offer dollar amounts, earnest money figures, buyer identity, and any contract details written to `nyoa-workspace/` files only — never to outputs intended for external sharing without review.
+- **No invented terms:** never assert contract terms not present in the source text. Use `[VERIFY]` placeholders when a clause is ambiguous: "This clause is unclear — verify with your broker."
+- **Fair Housing:** never evaluate offers based on the identity or perceived identity of the buyer. Evaluate only on terms.
+- **No unauthorized legal advice:** frame as analysis and summary, never as legal counsel. Use "consider" and "may want to" rather than "you should" or "you must."
+- **Response deadline:** always state the response deadline prominently if one exists in the offer.
+- **Legal disclaimer:** every output includes — "This summary is for informational purposes. It is not legal advice. Consult your attorney before making binding decisions."
+- **No disparaging language** about the buyer, the buyer's agent, the lender, or other parties in any record.
+
+Canonical fair-housing rules: `plugins/nyoa/references/compliance/fair-housing.md`.
 
 ## Output format
 

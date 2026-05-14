@@ -77,7 +77,24 @@ The playbook covers variant cadences for:
 - High-referral clients (add a month-3 referral ask, more frequent drop-bys 6-12)
 - Renter / future-buyer past clients (different anniversary year framing)
 
-## Compliance pass (mandatory before delivering)
+## Compliance pass
+
+Before delivering output, delegate to `/nyoa-compliance-review`:
+
+1. Generate the draft per the rest of this skill's workflow.
+2. Invoke `/nyoa-compliance-review` with the draft as input and this skill's name (`nyoa-touch-cadence`) as the calling context.
+3. If the review returns **APPROVED**, deliver the draft. `/nyoa-compliance-review` appends the disclaimer footer and writes the audit-log entry — do not duplicate.
+4. If the review returns **FIX RECOMMENDED** or **FIX REQUIRED**, surface the findings to the user. Apply their chosen action:
+   - **Apply all** — use the cleaned draft as the final output.
+   - **Apply selected** — apply only the user-chosen fixes.
+   - **Override** — capture the user's one-sentence reason; `/nyoa-compliance-review` logs it.
+   - **Edit manually** — return the findings to the user and stop; they re-run the skill when ready.
+   Then deliver.
+5. If the agent's **own input** contained a fair-housing violation, surface it explicitly in your response in addition to letting `/nyoa-compliance-review` catch it.
+
+Canonical rules and jurisdictional reasoning live in `plugins/nyoa/references/compliance/fair-housing.md` (loaded by `/nyoa-compliance-review`). Do not duplicate them here.
+
+Skill-specific guardrails the reviewer should weigh:
 
 - **No protected-class assumptions in any draft opener.** "Hope you and the family…" is out; "Hope this finds you well" is also out (template-speak). Specific or neutral, never demographic.
 - **Soft referral ask once.** Never schedule more than one referral ask in 12 months. Repeat asks are how relationships get burned.
@@ -110,6 +127,8 @@ Single Markdown response with these sections:
 5. **Workspace confirmation** — what was filed.
 
 End with: "Cadence saved. 12 tasks scheduled in nyoa-workspace/tasks.md and noted in clients/<slug>/timeline.md."
+
+The disclaimer footer is appended automatically by `/nyoa-compliance-review` — do not include it in this skill's own output template.
 
 ## Shared context
 
