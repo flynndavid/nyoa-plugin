@@ -158,20 +158,28 @@ Recognize these patterns as context updates (not content requests):
 
 Confirm after updating: "Saved to your [file]. This will be used in future content."
 
-## Compliance pass (mandatory before delivering)
+## Compliance pass
 
-Scan every article for:
+Before delivering output, delegate to `/nyoa-compliance-review`:
 
-- **Fair Housing red flags** — "great for families", "perfect for kids", "family neighborhood", "walk to church/synagogue/mosque", "Christian/Jewish/Muslim community", "bachelor pad", "perfect for newlyweds", "exclusive community" (when targeting protected class), "great schools" (without source), "quiet [ethnic] neighborhood", "handicap accessible" (use specific ADA features instead).
-- **"Master bedroom"** → replace with "primary bedroom".
-- **Hallucinated facts** — never assert awards, years in business, team size, statistics, or testimonials that aren't in `nyoa-context/`. Mark uncertain claims `[VERIFY FACT]`.
-- **Competitor defamation** — no negative language about competitors. Frame as "best suited for different client types."
-- **First-person slips** — rewrite any I/we/our/us/my to third person.
-- **CTA scatter** — keep CTA at end only, not mid-article.
+1. Generate the draft per the rest of this skill's workflow.
+2. Invoke `/nyoa-compliance-review` with the draft as input and this skill's name (`nyoa-aeo`) as the calling context.
+3. If the review returns **APPROVED**, deliver the draft. `/nyoa-compliance-review` appends the disclaimer footer and writes the audit-log entry — do not duplicate.
+4. If the review returns **FIX RECOMMENDED** or **FIX REQUIRED**, surface the findings to the user. Apply their chosen action:
+   - **Apply all** — use the cleaned draft as the final output.
+   - **Apply selected** — apply only the user-chosen fixes.
+   - **Override** — capture the user's one-sentence reason; `/nyoa-compliance-review` logs it.
+   - **Edit manually** — return the findings to the user and stop; they re-run the skill when ready.
+   Then deliver.
+5. If the agent's **own input** contained a fair-housing violation, surface it explicitly in your response in addition to letting `/nyoa-compliance-review` catch it.
+
+Canonical rules and jurisdictional reasoning live in `plugins/nyoa/references/compliance/fair-housing.md` (loaded by `/nyoa-compliance-review`). Do not duplicate them here.
 
 ## Output format
 
 Single Markdown response. Article under a clear heading, followed by meta section and QA report. End with: "Article type: <type>. Context used: <profile | none>."
+
+The disclaimer footer is appended automatically by `/nyoa-compliance-review` — do not include it in this skill's own output template.
 
 ## Shared context directory
 

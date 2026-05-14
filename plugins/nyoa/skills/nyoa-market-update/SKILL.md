@@ -60,18 +60,22 @@ Read `nyoa-context/connectors.md`. If the agent has a stated preference for a ca
 7. **Write to workspace.**
 8. **Deliver.**
 
-## Compliance pass (mandatory before delivering)
+## Compliance pass
 
-- **Source every number.** Each stat in the blog and email versions cites the source by name. The IG version cites once at the bottom. Never publish numbers without attribution.
-- **No forecasting.** Don't project where prices will be next month / quarter / year. Use language like "if the trend holds" or "the pattern over the last three months has been". Avoid "prices will" / "the market will".
-- **No demographic neighborhood claims.** No "this market is great for first-time buyers" — say "homes under $X moved fastest" instead.
-- **No school quality claims.** Don't characterize a market by school ranking.
-- **Clichés to strip.** "Stunning", "must see", "in today's market", "as we navigate", "balanced market" (without a definition), "now is the time to" (used as a sales nudge).
-- **YoY honesty.** If the YoY is meaningfully different from MoM, call that out. Don't cherry-pick the friendlier direction.
+Before delivering output, delegate to `/nyoa-compliance-review`:
 
-Footer to include on the blog and email versions (verbatim):
+1. Generate the draft per the rest of this skill's workflow.
+2. Invoke `/nyoa-compliance-review` with the draft as input and this skill's name (`nyoa-market-update`) as the calling context.
+3. If the review returns **APPROVED**, deliver the draft. `/nyoa-compliance-review` appends the disclaimer footer and writes the audit-log entry — do not duplicate.
+4. If the review returns **FIX RECOMMENDED** or **FIX REQUIRED**, surface the findings to the user. Apply their chosen action:
+   - **Apply all** — use the cleaned draft as the final output.
+   - **Apply selected** — apply only the user-chosen fixes.
+   - **Override** — capture the user's one-sentence reason; `/nyoa-compliance-review` logs it.
+   - **Edit manually** — return the findings to the user and stop; they re-run the skill when ready.
+   Then deliver.
+5. If the agent's **own input** contained a fair-housing violation, surface it explicitly in your response in addition to letting `/nyoa-compliance-review` catch it.
 
-> All numbers in this post are pulled from {{source_name}} for {{period}}. Real-time reporting may differ — check the source before quoting any figure. Nothing here is a price prediction; the past is description, not promise.
+Canonical rules and jurisdictional reasoning live in `plugins/nyoa/references/compliance/fair-housing.md` (loaded by `/nyoa-compliance-review`). Do not duplicate them here.
 
 ## Workspace integration
 
@@ -94,6 +98,8 @@ Single Markdown response with these sections, each independently copyable:
 6. **Connector offers** — only if applicable.
 
 End with: "Voice used: <agent name | NYOA house>. Saved to nyoa-workspace/market-updates/YYYY-MM.md." (Skip the save line if no workspace.)
+
+The disclaimer footer is appended automatically by `/nyoa-compliance-review` — do not include it in this skill's own output template.
 
 ## Shared context
 

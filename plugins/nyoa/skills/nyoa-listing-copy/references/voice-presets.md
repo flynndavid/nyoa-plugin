@@ -1,5 +1,7 @@
 # Voice Presets
 
+> Note: the canonical fair-housing rule list moved to `plugins/nyoa/references/compliance/fair-housing.md` in v0.9.0. This file now covers voice presets only.
+
 When the agent has no per-agent voice file, choose a preset based on the property's price tier and character. Each preset adjusts vocabulary, sentence rhythm, what features to lead with, and what the buyer self-ID looks like.
 
 If unsure, default to **starter** under $500K, **luxury** at $1.5M+, **NYOA house** in between. Fixer / investor / land are character-driven, not price-driven.

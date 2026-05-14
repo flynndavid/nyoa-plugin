@@ -72,22 +72,22 @@ Single Markdown file with these elements, copy-paste ready into any CMS:
 9. **Suggested internal links** — 3 links to other agent pages (other neighborhood pages, buyer guide, seller guide) if the agent's profile lists them.
 10. **(Optional) FAQ schema JSON-LD** — if the agent asks for it, generate a `<script type="application/ld+json">` block with the three FAQs in FAQPage schema. Pasteable into the page head.
 
-## Compliance pass (mandatory before delivering)
+## Compliance pass
 
-This skill's compliance pass is more important than most. Neighborhood pages are the most-litigated real-estate copy under Fair Housing law.
+Before delivering output, delegate to `/nyoa-compliance-review`:
 
-- **No demographic composition.** Don't describe who lives in the neighborhood — race, religion, ethnicity, family status, age, national origin, disability. None of it.
-- **No "great schools" claims.** District names are factual and OK. "Top-rated", "best", "great" school district is not, unless cited to a specific verifiable source with a date.
-- **No safety claims.** Don't say "safe", "low crime", "quiet neighborhood" (which courts have ruled is coded language). Talk about traffic patterns, foot-traffic, or streetscape facts instead.
-- **No "perfect for…" framing.** "Perfect for young families" is the textbook FHA violation. "Perfect for buyers who want a walk-up attic" is fine (property feature, not buyer demographic).
-- **No "diverse" / "exclusive" / "up-and-coming".** All coded.
-- **"Primary bedroom"** not "master bedroom" anywhere on the page.
-- **No unsourced statistics.** Every number cites a source by name (the local MLS, the city's open-data portal, a published study with date) and a period.
-- **Verify the neighborhood name.** If the agent provides a name that's contested (some "neighborhoods" are realtor marketing constructs not recognized locally), surface it: "Is 'East Nashville Heights' the name your buyers actually use, or are you marketing-naming a sub-area?" Don't refuse, but flag.
+1. Generate the draft per the rest of this skill's workflow.
+2. Invoke `/nyoa-compliance-review` with the draft as input and this skill's name (`nyoa-neighborhood-page`) as the calling context.
+3. If the review returns **APPROVED**, deliver the draft. `/nyoa-compliance-review` appends the disclaimer footer and writes the audit-log entry — do not duplicate.
+4. If the review returns **FIX RECOMMENDED** or **FIX REQUIRED**, surface the findings to the user. Apply their chosen action:
+   - **Apply all** — use the cleaned draft as the final output.
+   - **Apply selected** — apply only the user-chosen fixes.
+   - **Override** — capture the user's one-sentence reason; `/nyoa-compliance-review` logs it.
+   - **Edit manually** — return the findings to the user and stop; they re-run the skill when ready.
+   Then deliver.
+5. If the agent's **own input** contained a fair-housing violation, surface it explicitly in your response in addition to letting `/nyoa-compliance-review` catch it.
 
-Footer to include verbatim:
-
-> Market and property information current as of {{date}}. Verify all numbers against your local MLS or municipal source. This page describes geography, housing stock, and market conditions — it does not characterize the people who live in {{neighborhood_name}} and makes no representation about suitability for any protected class.
+Canonical rules and jurisdictional reasoning live in `plugins/nyoa/references/compliance/fair-housing.md` (loaded by `/nyoa-compliance-review`). Do not duplicate them here.
 
 ## Workspace integration
 
@@ -100,6 +100,8 @@ If `nyoa-workspace/web/neighborhoods/` exists (or scaffold it from `plugins/nyoa
 ## Output format
 
 Single Markdown response, structured to copy-paste into any CMS. End with: "Voice used: <agent name | NYOA house>. Saved to nyoa-workspace/web/neighborhoods/<slug>.md."
+
+The disclaimer footer is appended automatically by `/nyoa-compliance-review` — do not include it in this skill's own output template.
 
 ## Shared context
 

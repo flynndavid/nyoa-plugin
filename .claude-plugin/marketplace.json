@@ -11,7 +11,7 @@
       "name": "nyoa",
       "source": "./plugins/nyoa",
       "description": "Real estate agent operating system — 27 AI skills on a versioned workspace. Built on the v0.6 architecture (schema versioning, help system, hygiene tools). v0.8 adds /nyoa-3d-tour — vendor brief, DIY phone-scan checklist, hosting decision tree, embed snippets, and launch-day promotion package for photoreal 3D Gaussian Splat tours. v0.7 added an operations layer (contract deadlines, open-house promotion, monthly market updates), a growth layer (touch cadence, database audit, neighborhood pages), bookkeeping (receipts + settlement + mileage), and extensions to listing-audit (site SEO/AEO mode), listing-copy (carousel + photoshoot brief), social-content (weekly planner + IG playbook), and buyer/seller comms (birthday, anniversary, closing-day templates).",
-      "version": "0.8.0",
+      "version": "0.9.0",
       "author": {
         "name": "Automatic",
         "email": "david@automatic.so",

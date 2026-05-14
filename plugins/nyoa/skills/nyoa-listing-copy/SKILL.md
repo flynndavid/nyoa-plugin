@@ -69,16 +69,22 @@ Read `nyoa-context/connectors.md`. If user has a stated preference for a capabil
 
 > **Carousel and photoshoot brief (v0.7.0):** these are explicitly opt-in. Triggers — "7-slide carousel for this listing", "Instagram carousel script", "photoshoot brief", "shot list for the photographer", "what should the photographer shoot". The agent can ask for one, the other, or both.
 
-## Compliance pass (mandatory before delivering)
+## Compliance pass
 
-Scan every output for:
+Before delivering output, delegate to `/nyoa-compliance-review`:
 
-- **Fair Housing red flags** — "great for families", "perfect for kids", "family neighborhood", "walk to church / synagogue / mosque", "Christian / Jewish / Muslim community", "bachelor pad", "perfect for newlyweds", "exclusive community" (when targeting protected class), "great schools" (without source).
-- **"Master bedroom"** — replace with "primary bedroom".
-- **Unsourced structural claims** — never write "fully renovated", "new roof / HVAC / electrical", "completely updated" unless the agent confirmed it. If unconfirmed, soften ("recently refreshed kitchen") or pull entirely.
-- **Cliché ban** — strip "stunning", "must see", "nestled", "boasts", "rare opportunity", "luxury living awaits", "don't miss". Replace with concrete specifics.
+1. Generate the draft per the rest of this skill's workflow.
+2. Invoke `/nyoa-compliance-review` with the draft as input and this skill's name (`nyoa-listing-copy`) as the calling context.
+3. If the review returns **APPROVED**, deliver the draft. `/nyoa-compliance-review` appends the disclaimer footer and writes the audit-log entry — do not duplicate.
+4. If the review returns **FIX RECOMMENDED** or **FIX REQUIRED**, surface the findings to the user. Apply their chosen action:
+   - **Apply all** — use the cleaned draft as the final output.
+   - **Apply selected** — apply only the user-chosen fixes.
+   - **Override** — capture the user's one-sentence reason; `/nyoa-compliance-review` logs it.
+   - **Edit manually** — return the findings to the user and stop; they re-run the skill when ready.
+   Then deliver.
+5. If the agent's **own input** contained a fair-housing violation, surface it explicitly in your response in addition to letting `/nyoa-compliance-review` catch it.
 
-If the agent's input itself contains a Fair Housing red flag, surface it explicitly: "I flagged 'great for families' in your input — Fair Housing risk. Rewriting around the lifestyle without the demographic claim."
+Canonical rules and jurisdictional reasoning live in `plugins/nyoa/references/compliance/fair-housing.md` (loaded by `/nyoa-compliance-review`). Do not duplicate them here.
 
 ## Workspace integration
 
@@ -104,3 +110,5 @@ If the file is absent or the Tour URL field is empty, render every output withou
 ## Output format
 
 Single Markdown response. Each section under a clear `##` heading. Each output is independently copy-pasteable into the right channel. End with a one-line "Voice used: <agent name | preset name | NYOA house>" so the agent knows what produced this. If the workspace write-through ran, also confirm: "Saved to nyoa-workspace/listings/<slug>/copy.md."
+
+The disclaimer footer is appended automatically by `/nyoa-compliance-review` — do not include it in this skill's own output template.

@@ -43,6 +43,9 @@ A preconfigured Claude for real estate agents — a real operating system for yo
 ### Bookkeeping
 - **`/nyoa-bookkeeping`** *(new in v0.7.0)* — Three subcommands, one skill: `receipts` categorizes line items into standard real-estate categories and drafts a bookkeeper email; `settlement` extracts gross commission, brokerage split, net commission, and concessions from an ALTA/HUD statement; `mileage` builds a calendar-derived mileage log. All write to `nyoa-workspace/finance/<YYYY-MM>/` with a per-output verification footer.
 
+### Compliance
+- **`/nyoa-compliance-review`** *(new in v0.9.0)* — Universal fair-housing and advertising compliance check. Called automatically by every generative skill; also usable standalone on any pasted draft. Applies federal Fair Housing Act guardrails, the agent's state and local rules (read from `nyoa-context/profile.md`), NAR Code of Ethics Articles 10 and 12 if the agent is a NAR member, and current FTC AI-advertising guidance. Returns structured findings, lets the agent choose how to resolve them, appends a standard disclaimer, and writes one line to `nyoa-workspace/compliance-log.md` per review.
+
 All skills enforce **Fair Housing compliance** automatically (no protected-class language, no unsourced structural claims, "primary bedroom" not "master") and strip the usual real-estate clichés ("stunning", "must see", "nestled", "boasts").
 
 ---

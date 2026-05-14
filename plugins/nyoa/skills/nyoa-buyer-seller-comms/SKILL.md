@@ -96,12 +96,22 @@ Same voice resolution order as `nyoa-listing-copy`:
 
 Avoid template-speak: "I hope this email finds you well", "Just touching base", "Per our last conversation", "Looking forward to hearing from you".
 
-## Compliance
+## Compliance pass
 
-All the same Fair Housing rules as `nyoa-listing-copy/references/voice-presets.md`. Never:
-- Categorize the recipient by protected class ("families like yours", "couples like you")
-- Reference religion, ethnicity, national origin, familial status
-- Make protected-class assumptions about what a buyer wants
+Before delivering output, delegate to `/nyoa-compliance-review`:
+
+1. Generate the draft per the rest of this skill's workflow.
+2. Invoke `/nyoa-compliance-review` with the draft as input and this skill's name (`nyoa-buyer-seller-comms`) as the calling context.
+3. If the review returns **APPROVED**, deliver the draft. `/nyoa-compliance-review` appends the disclaimer footer and writes the audit-log entry — do not duplicate.
+4. If the review returns **FIX RECOMMENDED** or **FIX REQUIRED**, surface the findings to the user. Apply their chosen action:
+   - **Apply all** — use the cleaned draft as the final output.
+   - **Apply selected** — apply only the user-chosen fixes.
+   - **Override** — capture the user's one-sentence reason; `/nyoa-compliance-review` logs it.
+   - **Edit manually** — return the findings to the user and stop; they re-run the skill when ready.
+   Then deliver.
+5. If the agent's **own input** contained a fair-housing violation, surface it explicitly in your response in addition to letting `/nyoa-compliance-review` catch it.
+
+Canonical rules and jurisdictional reasoning live in `plugins/nyoa/references/compliance/fair-housing.md` (loaded by `/nyoa-compliance-review`). Do not duplicate them here.
 
 ## Workspace integration
 
@@ -116,3 +126,5 @@ If the workspace doesn't exist or the recipient isn't a tracked client, skip sil
 ## Output format
 
 Single Markdown response. If the user requested one channel, deliver one variant. If they didn't specify, deliver SMS + email by default (and a voicemail script for offer-summary, counter-offer, and referral-ask). End with a one-line note: "Channel: <SMS | email | voicemail>. Voice: <agent | NYOA house>". If workspace write-through ran or a connector was used, add a confirmation line (e.g., "Logged to clients/jane-doe/timeline.md." or "Drafted in Gmail.").
+
+The disclaimer footer is appended automatically by `/nyoa-compliance-review` — do not include it in this skill's own output template.
